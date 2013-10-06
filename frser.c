@@ -36,6 +36,15 @@ struct constanswer {
 	PGM_P data;
 } __attribute__ ((__packed__));
 
+
+/* Calculate a nice read-n max value so that it doesnt hurt performance, but
+   doesnt allow the device to be accidentally left in an "infini-tx" mode.
+   This is the amount of data it can send based on baud rate in 2 seconds rounded to kB. */
+
+#define BYTERATE (BAUD/5)
+#define KBPSEC ((BYTERATE+512)/1024)
+#define RDNMAX (KBPSEC*1024)
+
 const char PROGMEM ca_nop[1] = { S_ACK };
 const char PROGMEM ca_iface[3] = { S_ACK,0x01,0x00 };
 const char PROGMEM ca_bitmap[33] = { S_ACK, 0xFF, 0xFF, 0x3F };
@@ -46,7 +55,7 @@ const char PROGMEM ca_chipsize[2] = { S_ACK, 18 };
 const char PROGMEM ca_opbufsz[3] = { S_ACK, S_OPBUFLEN&0xFF, (S_OPBUFLEN>>8)&0xFF };
 const char PROGMEM ca_wrnlen[4] = { S_ACK, 0x00, 0x01, 0x00 };
 const char PROGMEM ca_syncnop[2] = { S_NAK, S_ACK };
-const char PROGMEM ca_rdnmaxlen[4] = { S_ACK, 0x00, 0x00, 0x00 };
+const char PROGMEM ca_rdnmaxlen[4] = { S_ACK, RDNMAX&0xFF, (RDNMAX>>8)&0xFF, (RDNMAX>>16)&0xFF };
 
 /* Commands with a const answer cannot have parameters */
 const struct constanswer PROGMEM const_table[S_MAXCMD+1] = {
@@ -288,10 +297,12 @@ void frser_main(void) {
 			continue;
 		}
 		if (setjmp(uart_timeout)) {
-			SEND(S_NAK);
+			/* We might be in the middle of an SPI operation or otherwise
+			   in a weird state. Re-init and hope for best. */
+			do_cmd_set_proto(last_set_bus_types);
+			SEND(S_NAK); /* Tell of a problem. */
 			continue;
 		}
-		uart_set_timeout(&uart_timeout);
 
 		a_len = pgm_read_byte(&(const_table[op].len));
 		/* These are the simple query-like operations, we just reply from ProgMem: */
@@ -304,6 +315,7 @@ void frser_main(void) {
 			}
 			continue;
 		}
+		uart_set_timeout(&uart_timeout);
 
 		p_len = pgm_read_byte(&(op2len[op]));
 		for (i=0;i<p_len;i++) parbuf[i] = RECEIVE();

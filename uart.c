@@ -21,8 +21,8 @@
 #include "main.h"
 #include "uart.h"
 
-/* This is 1s of our 16-bit timer. */
-#define UART_TIMEOUT 11718
+/* This is 2s of our 16-bit timer. */
+#define UART_TIMEOUT (F_CPU/512)
 
 // UART MODULE START
 typedef uint16_t urxbufoff_t;

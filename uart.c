@@ -1,7 +1,7 @@
 /*
  * This file is part of the frser-atmega644 project.
  *
- * Copyright (C) 2009,2011 Urja Rannikko <urjaman@gmail.com>
+ * Copyright (C) 2009,2011,2013 Urja Rannikko <urjaman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

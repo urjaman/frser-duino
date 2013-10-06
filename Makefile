@@ -73,7 +73,7 @@ bootloader-pgm: boot.hex
 	sudo make bootloader-pgm-r
 
 bootloader-pgm-r: boot.hex
-	$(AVRBINDIR)$(UISP) -v=3 -dprog=bbpg -dt_sck=5 --wr_fuse_e=0xFD --wr_fuse_h=0xDE --wr_fuse_l=0xC0 if=boot.hex --upload --verify
+	$(UISP) -v=3 -dprog=bbpg -dt_sck=5 --wr_fuse_e=0xFD --wr_fuse_h=0xDE --wr_fuse_l=0xC0 if=boot.hex --upload --verify
 
 bootloader: boot.hex
 

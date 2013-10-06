@@ -19,7 +19,9 @@
  */
 
 #include <avr/io.h>
+#ifndef RAMSTART
 #define RAMSTART 0x100
+#endif
 #if SPM_PAGESIZE > 256
 #error Too big SPM pagesize for the protocol
 #endif

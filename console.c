@@ -3,6 +3,7 @@
 #include "uart.h"
 #include "console.h"
 #include "ciface.h"
+#include "frser.h"
 
 #define CR 0x0D
 #define LF 0x0A
@@ -10,12 +11,14 @@
 #define DEL 0x7F
 #define SPACE 0x20
 
-int getline(unsigned char *buf, unsigned char len) {
+uint8_t getline(unsigned char *buf, unsigned char len) {
 	unsigned char val,i;
 	memset(buf,0,len);
 	for(i=0;i<len;i++) {
+		val = PEEK();
+		if ((val==S_CMD_NOP)||(val==S_CMD_Q_IFACE)||
+			(val==S_CMD_SYNCNOP)) return 1; // EXIT
 		val = RECEIVE();
-		if ((val==0)||(val==0x10)||(val=0x01)) return 1; // NOP,SYNCNOP,QUERY VERSION
 		if (((val == BS)||(val == DEL))&&(i)) { SEND(BS); SEND(SPACE); SEND(BS); i = i-2; continue; }; // Understand BS or DEL
 		if (val == CR) { SEND(CR); SEND(LF); buf[i] = 0; break; }; // Understand LF
 		if ((val < 32)||(val == DEL)) { i--; continue; };

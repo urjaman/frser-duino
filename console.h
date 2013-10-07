@@ -1,4 +1,4 @@
-int getline(unsigned char *buf, unsigned char len);
+uint8_t getline(unsigned char *buf, unsigned char len);
 void sendstr_P(PGM_P str);
 void sendstr(const unsigned char * str);
 unsigned char* scanfor_notspace(unsigned char *buf);

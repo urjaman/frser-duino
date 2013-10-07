@@ -53,10 +53,13 @@ int open_devfd(char * fn) {
 	options.c_cflag &= ~PARENB;
 	options.c_cflag &= ~CSTOPB;
 	options.c_cflag &= ~CSIZE;
+	options.c_cflag &= ~CRTSCTS;
 	options.c_cflag |= CS8;
 	options.c_lflag &= ~(ICANON|ECHO|ECHOE|ISIG);
 	options.c_iflag &= ~(IXON | IXOFF | IXANY);
 	options.c_oflag &= ~OPOST;
+	options.c_cc[VTIME] = 0;
+	
 	tcsetattr(fd, TCSANOW, &options);
 	return fd;
 	}
@@ -65,7 +68,7 @@ void dev_read(int fd, void*buf, int count) {
 	int i;
 	i = read(fd,buf,count);
 	if (i != count) {
-		printf("Read failed\n");
+		printf("Read failed %d vs %d\n",i,count);
 		exit(6);
 	}
 }

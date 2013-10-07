@@ -96,6 +96,12 @@ static void uart_waiting(void) {
 	}
 }
 
+uint8_t uart_peek(void) {
+	uart_wait_start();
+	while (!uart_isdata()) uart_waiting();
+	return uart_rcvbuf[uart_rcvrptr];
+}
+
 uint8_t uart_recv(void) {
 	urxbufoff_t reg;
 	uint8_t val;

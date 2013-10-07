@@ -25,10 +25,12 @@ void uart_send(uint8_t val);
 void uart_init(void);
 void uart_wait_txdone(void);
 void uart_set_timeout(jmp_buf *buf);
+uint8_t uart_peek(void);
 
 #define BAUD 1500000
 //#define BAUD 500000
 //#define BAUD 115200
+#define PEEK() uart_peek()
 #define RECEIVE() uart_recv()
 #define SEND(n) uart_send(n)
 #define UART_BUFLEN 1024

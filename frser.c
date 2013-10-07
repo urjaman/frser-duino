@@ -24,9 +24,10 @@
 #include "udelay.h"
 #include "spi.h"	
 #include "frser.h"
+#include "ciface.h"
 
 // Sys_bytes = stack + bss vars.
-#define SYS_BYTES 192
+#define SYS_BYTES 320
 #define RAM_BYTES (RAMEND-RAMSTART+1)
 /* The length of the operation buffer */
 #define S_OPBUFLEN (RAM_BYTES-SYS_BYTES-UART_BUFLEN-UARTTX_BUFLEN)
@@ -289,6 +290,10 @@ void frser_main(void) {
 		uint8_t i;
 		uart_set_timeout(NULL);
 		op = RECEIVE();
+		if (op == 0x20) { 
+			ciface_main();
+			continue;
+		}
 		if (op > S_MAXCMD) {
 			/* This is a pretty futile case as in that we shouldnt get
 			these commands at all with the supported cmd bitmap system */

@@ -20,7 +20,8 @@
 
 PROJECT=frser-atmega644
 DEPS=uart.h frser.h udelay.h main.h parallel.h lpc.h flash.h
-SOURCES=main.c uart.c flash.c udelay.c frser.c parallel.c lpc.c spi.c
+CIFASE_SOURCES=ciface.c console.c lib.c appdb.c commands.c
+SOURCES=main.c uart.c flash.c udelay.c frser.c parallel.c lpc.c spi.c $(CIFASE_SOURCES)
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy

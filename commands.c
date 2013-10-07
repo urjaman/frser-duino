@@ -192,6 +192,32 @@ void flash_readsect_cmd(void) {
 }
 
 
+void flash_proto_cmd(void) {
+	uint8_t proto = flash_get_proto();
+	sendstr_P(PSTR("PROTO: "));
+	switch (proto) {
+		case 0:
+		sendstr_P(PSTR("NONE"));
+		break;
+
+		case CHIP_BUSTYPE_PARALLEL:
+		sendstr_P(PSTR("PARALLEL"));
+		break;
+
+		case CHIP_BUSTYPE_LPC:
+		sendstr_P(PSTR("LPC"));
+		break;
+
+		case CHIP_BUSTYPE_FWH:
+		sendstr_P(PSTR("FWH"));
+		break;
+
+		case CHIP_BUSTYPE_SPI:
+		sendstr_P(PSTR("SPI"));
+		break;
+	}
+}
+
 void flash_idchip_cmd(void) {
 	unsigned char buf[5];
 	unsigned int chipid;
@@ -199,4 +225,10 @@ void flash_idchip_cmd(void) {
 	uint2xstr(buf,chipid);
 	sendstr(buf);
 	return;
+}
+
+void bljump_cmd(void) {
+	void (*btloader)(void)	= (void*)(BTLOADERADDR>>1); // Make PM
+	_delay_ms(100);
+	btloader();
 }

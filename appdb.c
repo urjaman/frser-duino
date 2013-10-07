@@ -6,6 +6,8 @@
 const unsigned char echostr[] PROGMEM = "ECHO";
 const unsigned char readsectstr[] PROGMEM = "READSECT";
 const unsigned char flashidstr[] PROGMEM = "IDCHIP";
+const unsigned char qprotostr[] PROGMEM = "QPROTO";
+const unsigned char bljumpstr[] PROGMEM = "BLJUMP";
 const unsigned char calcstr[] PROGMEM = "CALC";
 const unsigned char helpstr[] PROGMEM = "?";
 
@@ -13,6 +15,8 @@ const struct command_t appdb[] PROGMEM = {
 	{(PGM_P)echostr, &(echo_cmd)},
 	{(PGM_P)readsectstr, &(flash_readsect_cmd)},
 	{(PGM_P)flashidstr, &(flash_idchip_cmd)},
+	{(PGM_P)qprotostr, &(flash_proto_cmd)},
+	{(PGM_P)bljumpstr, &(bljump_cmd)},
 	{(PGM_P)calcstr, &(calc_cmd)},
 	{(PGM_P)helpstr, &(help_cmd)},
 	{NULL,NULL}

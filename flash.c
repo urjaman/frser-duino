@@ -47,6 +47,10 @@ void flash_set_safe(void) {
 //#define SD(x) SEND(X)
 #define SD(x)
 
+uint8_t flash_get_proto(void) {
+	return flash_prot_in_use;
+}
+
 void flash_select_protocol(uint8_t allowed_protocols) {
 	allowed_protocols &= SUPPORTED_BUSTYPES;
 	flash_portclear();

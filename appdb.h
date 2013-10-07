@@ -11,4 +11,6 @@ void help_cmd(void);
 void flash_readsect_cmd(void);
 void flash_idchip_cmd(void);
 void calc_cmd(void);
+void flash_proto_cmd(void);
+void bljump_cmd(void);
 

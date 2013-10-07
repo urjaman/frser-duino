@@ -29,6 +29,88 @@
 #include <string.h>
 #include <inttypes.h>
 
+struct baudentry {
+	int flag;
+	unsigned int baud;
+};
+#define BAUDENTRY(baud) { B##baud, baud },
+
+static const struct baudentry sp_baudtable[] = {
+	BAUDENTRY(9600) /* unconditional default */
+#if defined(B19200)
+	BAUDENTRY(19200)
+#endif
+#if defined(B38400)
+	BAUDENTRY(38400)
+#endif
+#if defined(B57600) 
+	BAUDENTRY(57600)
+#endif
+#if defined(B115200)
+	BAUDENTRY(115200)
+#endif
+#if defined(B230400)
+	BAUDENTRY(230400)
+#endif
+#if defined(B460800)
+	BAUDENTRY(460800)
+#endif
+#if defined(B500000)
+	BAUDENTRY(500000)
+#endif
+#if defined(B576000)
+	BAUDENTRY(576000)
+#endif
+#if defined(B921600) 
+	BAUDENTRY(921600)
+#endif
+#if defined(B1000000)
+	BAUDENTRY(1000000)
+#endif
+#if defined(B1152000)
+	BAUDENTRY(1152000)
+#endif
+#if defined(B1500000) 
+	BAUDENTRY(1500000)
+#endif
+#if defined(B2000000)
+	BAUDENTRY(2000000)
+#endif
+#if defined(B2500000)
+	BAUDENTRY(2500000)
+#endif
+#if defined(B3000000)
+	BAUDENTRY(3000000)
+#endif
+#if defined(B3500000)
+	BAUDENTRY(3500000)
+#endif
+#if defined(B4000000)
+	BAUDENTRY(4000000)
+#endif
+	{0, 0}			/* Terminator */
+};
+
+void set_baudrate(int fd, unsigned int baud) {
+	int i;
+	struct termios options;
+	int bro = -1;
+	for (i=0;sp_baudtable[i].baud;i++) {
+		if (sp_baudtable[i].baud == baud) {
+			bro = i;
+			break;
+		}
+	}
+	if (bro==-1) {
+		printf("Cannot set baud rate %d\n",baud);
+		exit(10);
+	}
+	tcgetattr(fd,&options);
+	cfsetispeed(&options, sp_baudtable[bro].flag);
+	cfsetospeed(&options, sp_baudtable[bro].flag);
+	tcsetattr(fd, TCSANOW, &options);
+}
+
 /* command generation */
 #define TAG_CHAR 0x55
 #define INIT_CMD 0xAA
@@ -73,7 +155,7 @@ void dev_read(int fd, void*buf, int count) {
 	}
 }
 
-void dev_write(int fd, void*buf, int count) {
+void dev_write(int fd, const void*buf, int count) {
 	int i;
 	i = write(fd,buf,count);
 	if (i != count) {
@@ -89,16 +171,31 @@ void dev_reset(int devfd) {
 }
 
 int main(int argc, char * argv[]) {
+	int argvbase=1;
+	unsigned int bljump_baud = 0;
 	uint8_t c;
 	int devfd,flashfd,i,datasz,pagesz;
-	if (argc != 3) { 
+	if (argc < 3) { 
 		printf("Usage: %s flash_file serial_device\n",argv[0]);
 		exit(1);
-		}
-	devfd = open_devfd(argv[2]);
+	}
+	if (strncmp(argv[argvbase],"--bljump=",9)==0) {
+		bljump_baud = atoi(argv[argvbase]+9);
+		argvbase++;
+	}
+	devfd = open_devfd(argv[argvbase+1]);
 	printf("Connected.\n");
+	if (bljump_baud) {
+		set_baudrate(devfd,bljump_baud);
+		printf("Doing BLJUMP (baud=%d).\n",bljump_baud);
+		const char* cmd = "     BLJUMP\r\n";
+		dev_write(devfd,cmd,strlen(cmd));
+		tcdrain(devfd);
+		set_baudrate(devfd,115200);
+	}
 	sleep(1);
-	flashfd = open(argv[1],O_RDWR);
+	tcflush(devfd,TCIFLUSH);
+	flashfd = open(argv[argvbase],O_RDWR);
 	if (flashfd == -1) {
 		printf("Flash file open fail\n");
 		exit(3);
@@ -114,7 +211,7 @@ int main(int argc, char * argv[]) {
 	dev_write(devfd,&c,1);
 	dev_read(devfd,&c,1);
 	if (c != TAG_CHAR) {
-			printf("Read invalid - %02X\n",(int)c);
+			printf("Read invalid - 0x%02X\n",(int)c);
 			exit(7);
 	}
 	dev_read(devfd,&c,1);
@@ -129,7 +226,7 @@ int main(int argc, char * argv[]) {
 		dev_write(devfd,&(buffer[i]),pagesz);
 		dev_read(devfd,&c,1);
 		if (c != TAG_CHAR) {
-			printf("Read invalid - %02X\n",(int)c);
+			printf("Read invalid - 0x%02X\n",(int)c);
 			dev_reset(devfd);
 			exit(8);
 		}

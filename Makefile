@@ -20,8 +20,8 @@
 
 PROJECT=frser-atmega644
 DEPS=uart.h frser.h udelay.h main.h parallel.h lpc.h flash.h
-CIFASE_SOURCES=ciface.c console.c lib.c appdb.c commands.c
-SOURCES=main.c uart.c flash.c udelay.c frser.c parallel.c lpc.c spi.c $(CIFASE_SOURCES)
+CIFACE_SOURCES=ciface.c console.c lib.c appdb.c commands.c
+SOURCES=main.c uart.c flash.c udelay.c frser.c parallel.c lpc.c spi.c $(CIFACE_SOURCES)
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
@@ -45,7 +45,7 @@ $(PROJECT).bin: $(PROJECT).out
 	$(AVRBINDIR)$(OBJCOPY) -j .text -j .data -O binary $(PROJECT).out $(PROJECT).bin
  
 $(PROJECT).out: $(SOURCES) $(DEPS)
-	$(AVRBINDIR)$(CC) $(CFLAGS) -I./ -o $(PROJECT).out $(SOURCES)
+	$(AVRBINDIR)$(CC) -DBTLOADERADDR=$(BTLOADERADDR) $(CFLAGS) -I./ -o $(PROJECT).out $(SOURCES)
 	$(AVRBINDIR)avr-size $(PROJECT).out
 	
 asm: $(SOURCES) $(DEPS)
@@ -91,6 +91,9 @@ sr-program: $(PROJECT).bin serialprogrammer
 	modprobe ftdi_sio
 	sleep 1s
 	./serialprogrammer $(PROJECT).bin $(SERIAL_DEV)
+
+blj-program: $(PROJECT).bin serialprogrammer
+	./serialprogrammer --bljump=1500000 $(PROJECT).bin $(SERIAL_DEV)
 
 serialprogrammer: serialprogrammer.c
 	gcc -W -Wall -Os -o serialprogrammer serialprogrammer.c

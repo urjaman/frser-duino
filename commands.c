@@ -25,6 +25,11 @@
 #include "appdb.h"
 #include "flash.h"
 #include "ciface.h"
+#include "spi.h"
+#include "lpc.h"
+#include "parallel.h"
+#include "lpc.h"
+#include "fwh.h"
 
 static void sendcrlf(void) {
 	sendstr_P(PSTR("\r\n"));
@@ -60,6 +65,14 @@ unsigned long int calc_opdo(unsigned long int val1, unsigned long int val2, unsi
 			break;
 		case '|':
 			val1 |= val2;
+			break;
+
+		case '<':
+			val1 = val1 << val2;
+			break;
+
+		case '>':
+			val1 = val1 >> val2;
 			break;
 	}
 	return val1;
@@ -245,6 +258,69 @@ void flash_idchip_cmd(void) {
 	uint2xstr(buf,chipid);
 	sendstr(buf);
 	return;
+}
+
+static void sendstr_no(void) {
+	sendstr_P(PSTR(" NO"));
+}	
+
+void spi_id_cmd(void) {
+	uint8_t buf[4];
+	uint8_t idb[3];
+	spi_init_cond();
+	sendstr_P(PSTR("RDID:"));
+	buf[0] = ' ';
+	if (spi_probe_rdid(idb)) {
+		uchar2xstr(buf+1,idb[0]);
+		sendstr(buf);
+		uchar2xstr(buf+1,idb[1]);
+		sendstr(buf);
+		uchar2xstr(buf+1,idb[2]);
+		sendstr(buf);
+	} else {
+		sendstr_no();
+	}
+	sendstr_P(PSTR(" REMS:"));
+	if (spi_probe_rems(idb)) {
+		uchar2xstr(buf+1,idb[0]);
+		sendstr(buf);
+		uchar2xstr(buf+1,idb[1]);
+		sendstr(buf);
+	} else {
+		sendstr_no();
+	}
+	sendstr_P(PSTR(" RES:"));
+	if (spi_probe_res(idb)) {
+		uchar2xstr(buf+1,idb[0]);
+		sendstr(buf);
+	} else {
+		sendstr_no();
+	}
+}	
+
+static void print_bool(uint8_t v) {
+	if (v) sendstr_P(PSTR("TRUE"));
+	else sendstr_P(PSTR("FALSE"));
+}
+
+void spi_test_cmd(void) {
+	flash_set_safe();
+	print_bool(spi_test());
+}
+
+void par_test_cmd(void) {
+	flash_set_safe();
+	print_bool(parallel_test());
+}
+
+void lpc_test_cmd(void) {
+	flash_set_safe();
+	print_bool(lpc_test());
+}
+
+void fwh_test_cmd(void) {
+	flash_set_safe();
+	print_bool(fwh_test());
 }
 
 void bljump_cmd(void) {

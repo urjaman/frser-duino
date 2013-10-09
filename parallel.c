@@ -150,16 +150,19 @@ static uint8_t parallel_readcycle(uint32_t addr) {
 uint8_t parallel_test(void) {
 	DDRA &= ~_BV(3);
 	PORTA |= _BV(3);
-	_delay_us(1);
-	if (!(PINA&_BV(3))) { // detected LPC/FWH chip - A13 wont rise because its GND
-		PORTA &= ~_BV(3); // A13 to zero (GND)
-		PORTA |= _BV(6);  // A11 to one (Vcc)
-		DDRA |= _BV(3)|_BV(6); // drive them
-		return 0; // dont try parallel access
-		}
+	uint8_t x=(F_CPU/1000000); // This results in 5microsecond maximum pullup wait since the loop is 5 cycles
+	do {
+		if (PINA&_BV(3)) goto okexit; // Pullup works => parallel
+	} while (--x); 
+	PORTA &= ~_BV(3); // A13 to zero (GND)
+	PORTA |= _BV(6);  // A11 to one (Vcc)
+	DDRA |= _BV(3);
+	DDRA |= _BV(6); // drive them (two sbi's is shorter than in ori out)
+	return 0; // dont try parallel access
+okexit:
 	DDRA |= _BV(3); // allow driving
 	return 1; // all seems ok, go for it  :)
-	}
+}
 
 void parallel_readn(uint32_t addr, uint32_t len) {
 	if (parallel_test()) {

@@ -33,4 +33,8 @@ void flash_idchip_cmd(void);
 void calc_cmd(void);
 void flash_proto_cmd(void);
 void bljump_cmd(void);
-
+void spi_id_cmd(void);
+void spi_test_cmd(void);
+void par_test_cmd(void);
+void lpc_test_cmd(void);
+void fwh_test_cmd(void);

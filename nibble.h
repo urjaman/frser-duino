@@ -1,5 +1,5 @@
 /*
-	This file was part of bbflash, is part of frser-atmega644.
+	This file is part of bbflash.
 	Copyright (C) 2013, Hao Liu and Robert L. Thompson
 
 	This program is free software: you can redistribute it and/or modify
@@ -15,15 +15,28 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef LPC_H_
-#define LPC_H_
+#ifndef NIBBLE_H_
+#define NIBBLE_H_
 #include "mybool.h"
 
-bool lpc_init(void);
-uint8_t lpc_test(void);
-void lpc_cleanup(void);
-uint8_t lpc_test(void);
-int lpc_read_address(uint32_t addr);
-bool lpc_write_address(uint32_t addr, uint8_t byte);
+#define OUTPUT 1
+#define INPUT 0
 
-#endif /* LPC_H_ */
+bool nibble_init();
+void nibble_cleanup();
+void clocked_nibble_write(uint8_t value);
+uint8_t clocked_nibble_read();
+void nibble_start(uint8_t start);
+bool nibble_ready_sync();
+uint8_t byte_read();
+void byte_write(uint8_t byte);
+void nibble_hw_init(void);
+void nibble_set_dir(uint8_t dir);
+uint8_t nibble_read(void);
+void nibble_write(uint8_t data);
+void clock_low(void);
+void clock_high(void);
+void clock_cycle(void);
+
+
+#endif /* NIBBLE_H_ */

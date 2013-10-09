@@ -27,7 +27,7 @@
 
 #define RECVBUFLEN 64
 
-const unsigned char prompt[] PROGMEM = "\x0D\x0A >";
+const unsigned char prompt[] PROGMEM = "\x0D\x0A> ";
 unsigned char recvbuf[RECVBUFLEN];
 unsigned char token_count;
 unsigned char* tokenptrs[MAXTOKENS] __attribute__((aligned(16)));

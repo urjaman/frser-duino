@@ -1,6 +1,7 @@
 /*
-	This file is part of bbflash.
+	This file was part of bbflash, now frser-atmega644.
 	Copyright (C) 2013, Hao Liu and Robert L. Thompson
+	Copyright (C) 2013, Urja Rannikko <urjaman@gmail.com>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -17,84 +18,86 @@
 */
 #include "main.h"
 #include "nibble.h"
-#include "lpc.h"
+#include "fwh.h"
 #include "parallel.h"
 
-#define LPC_START 0b0000
-#define LPC_CYCTYPE_READ 0b0100
-#define LPC_CYCTYPE_WRITE 0b0110
+#define FWH_START_READ 0b1101
+#define FWH_START_WRITE 0b1110
+#define FWH_ABORT 0b1111
 
-#define LPC_BL_ADDR 0xff000000
+#define FWH_BL_ADDR 0xff000000
 
-bool lpc_init(void)
+
+bool fwh_init(void)
 {
 	return nibble_init();
 }
 
-void lpc_cleanup(void)
+void fwh_cleanup(void)
 {
 	nibble_cleanup();
 }
 
-static void lpc_start(void)
-{
-	nibble_start(LPC_START);
-}
-
-static void lpc_nibble_write(uint8_t value)
+static void fwh_nibble_write(uint8_t value)
 {
 	clocked_nibble_write(value);
 }
 
-static void lpc_send_addr(uint32_t addr)
+static void fwh_start(uint8_t start)
 {
-	int8_t i;
-	addr |= LPC_BL_ADDR;
-	for (i = 28; i >= 0; i -= 4)
-		lpc_nibble_write((addr >> i) & 0xf);
+	nibble_start(start);
 }
 
-int lpc_read_address(uint32_t addr)
+static void fwh_send_imaddr(uint32_t addr)
 {
-	lpc_start();
-	lpc_nibble_write(LPC_CYCTYPE_READ);
-	lpc_send_addr(addr);
+	int8_t i;
+	addr |= FWH_BL_ADDR;
+	for (i = 24; i >= 0; i -= 4)
+		fwh_nibble_write((addr >> i) & 0xf); /* That shift is evil. Fix later. */
+}
+
+int fwh_read_address(uint32_t addr)
+{
+	fwh_start(FWH_START_READ);
+	fwh_nibble_write(0);	/* IDSEL hardwired */
+	fwh_send_imaddr(addr);
+	fwh_nibble_write(0);	/* IMSIZE single byte */
 	nibble_set_dir(INPUT);
 	clock_cycle();
 	if (!nibble_ready_sync())
 		return -1;
 	uint8_t byte = byte_read();
 	clock_cycle();
-	clock_cycle();
+	nibble_set_dir(OUTPUT);
+	fwh_nibble_write(0xf);
 	clock_cycle();
 	return byte;
 }
 
-bool lpc_write_address(uint32_t addr, uint8_t byte)
+bool fwh_write_address(uint32_t addr, uint8_t byte)
 {
-	lpc_start();
-	lpc_nibble_write(LPC_CYCTYPE_WRITE);
-	lpc_send_addr(addr);
+	fwh_start(FWH_START_WRITE);
+	fwh_nibble_write(0);	/* IDSEL hardwired */
+	fwh_send_imaddr(addr);
+	fwh_nibble_write(0);	/* IMSIZE single byte */
 	byte_write(byte);
+	nibble_write(0xf);
 	nibble_set_dir(INPUT);
 	clock_cycle();
 	clock_cycle();
 	if (!nibble_ready_sync())
 		return false;
 	clock_cycle();
-//	clock_cycle(lpc->clock);
 	return true;
 }
 
-
-
-uint8_t lpc_test(void) {
+uint8_t fwh_test(void) {
 	if (parallel_test()) return 0; // If parallel test succeeds, not FWH/LPC
 	nibble_hw_init();
 	PORTB &= ~_BV(1); //!RST
 	_delay_us(1);
 	PORTB |= _BV(1);
-	lpc_init();
-	if (lpc_read_address(0xFFFFFFFF)==-1) return 0;
+	fwh_init();
+	if (fwh_read_address(0xFFFFFFFF)==-1) return 0;
 	return 1;
 }

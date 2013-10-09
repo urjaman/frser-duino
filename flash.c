@@ -107,7 +107,7 @@ uint8_t flash_read(uint32_t addr) {
 		case CHIP_BUSTYPE_PARALLEL:
 			return parallel_read(addr);
 		case CHIP_BUSTYPE_LPC:
-			return lpc_read(addr);
+			return lpc_read_address(addr);
 		case CHIP_BUSTYPE_SPI:
 			return spi_read(addr);
 	}
@@ -125,7 +125,7 @@ void flash_readn(uint32_t addr, uint32_t len) {
 			parallel_readn(addr,len);
 			return;
 		case CHIP_BUSTYPE_LPC:
-			lpc_readn(addr,len);
+			while (len--) SEND(lpc_read_address(addr++));
 			return;
 		case CHIP_BUSTYPE_SPI:
 			spi_readn(addr,len);
@@ -143,7 +143,7 @@ void flash_write(uint32_t addr, uint8_t data) {
 			parallel_write(addr,data);
 			return;
 		case CHIP_BUSTYPE_LPC:
-			lpc_write(addr,data);
+			lpc_write_address(addr,data);
 			return;
 	}
 }

@@ -138,31 +138,34 @@ uint8_t oddparity(uint8_t val) {
 	return (val ^ (val >> 1)) & 0x1;
 }
 
-static uint8_t spi_probe_rdid(void) {
+uint8_t spi_probe_rdid(uint8_t *id) {
 	const uint8_t out[1] = { 0x9F };
 	uint8_t in[3];
 	spi_localop(1,out,3,in);
 	if (!oddparity(in[0])) return 0;
 	if ((in[0] == 0xFF)&&(in[1] == 0xFF)&&(in[2] == 0xFF)) return 0;
 	if ((in[0] == 0)&&(in[1] == 0)&&(in[2] == 0)) return 0;
+	if (id) memcpy(id,in,3);
 	return 1;
 }
 
-static uint8_t spi_probe_rems(void) {
+uint8_t spi_probe_rems(uint8_t *id) {
 	const uint8_t out[4] = { 0x90, 0, 0, 0 };
 	uint8_t in[2];
 	spi_localop(4,out,2,in);
 	if ((in[0] == 0xFF)&&(in[1] == 0xFF)) return 0;
 	if ((in[0] == 0)&&(in[1] == 0)) return 0;
+	if (id) memcpy(id,in,2);
 	return 1;
 }
 
-static uint8_t spi_probe_res(void) {
+uint8_t spi_probe_res(uint8_t *id) {
 	const uint8_t out[4] = { 0xAB, 0, 0, 0 };
 	uint8_t in[1];
 	spi_localop(4,out,1,in);
 	if (in[0] == 0xFF) return 0;
 	if (in[0] == 0) return 0;
+	if (id) *id = in[0];
 	return 1;
 }
 
@@ -171,9 +174,9 @@ uint8_t spi_test(void) {
 #if 0
 	return 1;
 #else
-	if (spi_probe_rdid()) return 1;
-	if (spi_probe_rems()) return 1;
-	if (spi_probe_res()) return 1;
+	if (spi_probe_rdid(NULL)) return 1;
+	if (spi_probe_rems(NULL)) return 1;
+	if (spi_probe_res(NULL)) return 1;
 	spi_uninit();
 	return 0;
 #endif

@@ -46,9 +46,10 @@ void frser_main(void) __attribute__((noreturn));
 #define S_CMD_O_SPIOP		0x13		/* Perform SPI operation.			*/
 #define S_CMD_S_SPI_FREQ	0x14		/* Set SPI clock frequency			*/
 #define S_CMD_S_PIN_STATE	0x15		/* Enable/disable output drivers		*/
+#define S_CMD_O_TOGGLERDY	0x16		/* Write to opbuf: wait JEDEC toggle ready	*/
 
 /* The biggest valid command value */
-#define S_MAXCMD 0x15
-/* The maximum static length of parameters (read n/spiop) */
-#define S_MAXLEN 0x06
+#define S_MAXCMD 0x16
+/* The maximum static length of parameters (togglerdy) */
+#define S_MAXLEN 0x07
 

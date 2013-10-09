@@ -48,7 +48,7 @@ struct constanswer {
 
 const char PROGMEM ca_nop[1] = { S_ACK };
 const char PROGMEM ca_iface[3] = { S_ACK,0x01,0x00 };
-const char PROGMEM ca_bitmap[33] = { S_ACK, 0xFF, 0xFF, 0x3F };
+const char PROGMEM ca_bitmap[33] = { S_ACK, 0xFF, 0xFF, 0x7F };
 const char PROGMEM ca_pgmname[17] = { S_ACK, 'A','T','M','e','g','a','6','4','4',' ','U','S','B' }; /* An ATMega644 FTDI USB device */
 const char PROGMEM ca_serbuf[3] = { S_ACK, UART_BUFLEN&0xFF, (UART_BUFLEN>>8)&0xFF };
 const char PROGMEM ca_bustypes[2] = { S_ACK, SUPPORTED_BUSTYPES };
@@ -81,7 +81,8 @@ const struct constanswer PROGMEM const_table[S_MAXCMD+1] = {
 	{ 0, NULL },		// Set bustype
 	{ 0, NULL },		// SPI operation
 	{ 0, NULL },		// SPI speed
-	{ 0, NULL }		// set output drivers
+	{ 0, NULL },		// set output drivers
+	{ 0, NULL }		// JEDEC toggle rdy
 };
 
 const uint8_t PROGMEM op2len[S_MAXCMD+1] = { /* A table to get  parameter length from opcode if possible (if not 0) */
@@ -92,7 +93,7 @@ const uint8_t PROGMEM op2len[S_MAXCMD+1] = { /* A table to get  parameter length
 		0x04, 0x00, 0x04,	/* write byte, write n, write delay */
 		0x00, 0x00, 0x00,	/* Exec opbuf, syncnop, max read-n */
 		0x01, 0x06, 0x04,	/* Set used bustype, SPI op, spi-speed */
-		0x01			/* output drivers */
+		0x01, 0x07		/* output drivers, jedec toggle rdy */
 	};
 
 static uint8_t last_set_bus_types = SUPPORTED_BUSTYPES;
@@ -100,6 +101,7 @@ static uint8_t last_set_pin_state = 1;
 
 #define OPBUF_WRITEOP 0x00
 #define OPBUF_DELAYOP 0x01
+#define OPBUF_TOGGLERDY 0x02
 static uint8_t opbuf[S_OPBUFLEN];
 static uint16_t opbuf_bytes = 0;
 
@@ -207,6 +209,22 @@ nakret:
 	return;
 	}
 
+static void do_cmd_opbuf_togglerdy(uint8_t *parbuf) {
+	if (opbuf_addbyte(OPBUF_TOGGLERDY)) goto nakret;
+	if (opbuf_addbyte(parbuf[0])) goto nakret;
+	if (opbuf_addbyte(parbuf[1])) goto nakret;
+	if (opbuf_addbyte(parbuf[2])) goto nakret;
+	if (opbuf_addbyte(parbuf[3])) goto nakret;
+	if (opbuf_addbyte(parbuf[4])) goto nakret;
+	if (opbuf_addbyte(parbuf[5])) goto nakret;
+	if (opbuf_addbyte(parbuf[6])) goto nakret;
+	SEND(S_ACK);
+	return;
+nakret:
+	SEND(S_NAK);
+	return;
+	}
+
 static void do_cmd_opbuf_writen(void) {
 	uint8_t len;
 	uint8_t plen = 3;
@@ -269,6 +287,30 @@ static void do_cmd_opbuf_exec(void) {
 			udelay(usecs);
 			continue;
 		}
+		if (op == OPBUF_TOGGLERDY) {
+			uint8_t tmp1, tmp2;
+			uint32_t i = 0;
+			uint32_t usecs;
+			usecs  = (((uint32_t)(opbuf[readptr++])) << 0);
+			usecs |= (((uint32_t)(opbuf[readptr++])) << 8);
+			usecs |= (((uint32_t)(opbuf[readptr++])) << 16);
+			usecs |= (((uint32_t)(opbuf[readptr++])) << 24);
+			if (readptr > opbuf_bytes) goto nakret;
+			uint32_t addr = buf2u24(opbuf+readptr);
+			readptr += 3;
+			if (readptr > opbuf_bytes) goto nakret;
+		        tmp1 = flash_read(addr) & 0x40;
+		        while (i++ < 0xFFFFFFF) {
+		                if (usecs) udelay(usecs);
+		                tmp2 = flash_read(addr) & 0x40;
+                		if (tmp1 == tmp2) {
+		                        break;
+                		}
+		                tmp1 = tmp2;
+        		}
+			continue;
+		}
+
 		goto nakret;
 	}
 	opbuf_bytes = 0;
@@ -366,6 +408,10 @@ void frser_main(void) {
 			case S_CMD_S_PIN_STATE:
 				SEND(S_ACK);
 				do_cmd_pin_state(parbuf[0]);
+				break;
+
+			case S_CMD_O_TOGGLERDY:
+				do_cmd_opbuf_togglerdy(parbuf);
 				break;
 		}
 	}

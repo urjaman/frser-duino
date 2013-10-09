@@ -20,13 +20,13 @@
 #include "nibble.h"
 #include "fwh.h"
 #include "parallel.h"
+#include "typeu.h"
 
 #define FWH_START_READ 0b1101
 #define FWH_START_WRITE 0b1110
 #define FWH_ABORT 0b1111
 
 #define FWH_BL_ADDR 0xff000000
-
 
 bool fwh_init(void)
 {
@@ -38,22 +38,36 @@ void fwh_cleanup(void)
 	nibble_cleanup();
 }
 
-static void fwh_nibble_write(uint8_t value)
-{
-	clocked_nibble_write(value);
-}
+#define fwh_nibble_write(v) clocked_nibble_write(v)
 
-static void fwh_start(uint8_t start)
-{
-	nibble_start(start);
-}
+#define fwh_start(v) nibble_start(v)
 
 static void fwh_send_imaddr(uint32_t addr)
 {
+#if 0
 	int8_t i;
 	addr |= FWH_BL_ADDR;
 	for (i = 24; i >= 0; i -= 4)
 		fwh_nibble_write((addr >> i) & 0xf); /* That shift is evil. Fix later. */
+#else
+	uint8_t tmp;
+	u32_u a;
+	a.l = addr;
+	/* NOTE: revise this if FWH_BL_ADDR changes. */
+	fwh_nibble_write(0xF);
+	tmp = a.b[2];
+	swap(tmp);
+	fwh_nibble_write(tmp);
+	fwh_nibble_write(a.b[2]);
+	tmp = a.b[1];
+	swap(tmp);
+	fwh_nibble_write(tmp);
+	fwh_nibble_write(a.b[1]);
+	tmp = a.b[0];
+	swap(tmp);
+	fwh_nibble_write(tmp);
+	fwh_nibble_write(a.b[0]);
+#endif
 }
 
 int fwh_read_address(uint32_t addr)

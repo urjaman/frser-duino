@@ -25,6 +25,8 @@
 #include "lpc.h"
 #include "spi.h"
 #include "frser.h"
+#include "fwh.h"
+#include "nibble.h"
 
 static uint8_t flash_prot_in_use=0;
 
@@ -51,28 +53,39 @@ uint8_t flash_get_proto(void) {
 	return flash_prot_in_use;
 }
 
+uint8_t flash_idle_clock(void) {
+#if 1
+	if (flash_prot_in_use&(CHIP_BUSTYPE_LPC|CHIP_BUSTYPE_FWH)) {
+		clock_cycle();
+		return 1;
+	}
+#endif
+	return 0;
+}
+
 void flash_select_protocol(uint8_t allowed_protocols) {
 	allowed_protocols &= SUPPORTED_BUSTYPES;
 	flash_portclear();
 	if (spi_test()) {
 		// 0 or SPI, because using parallel while SPI chip is attached is potentially dangerous.
 		flash_prot_in_use = allowed_protocols&CHIP_BUSTYPE_SPI;
-		SD('S');
 		return;
-		}
+	}
 	flash_portclear();
 	if ((allowed_protocols&CHIP_BUSTYPE_PARALLEL)&&(parallel_test())) {
 		flash_prot_in_use = CHIP_BUSTYPE_PARALLEL;
-		SD('P');
 		return;
-		}
+	}
 	flash_portclear();
 	if ((allowed_protocols&CHIP_BUSTYPE_LPC)&&(lpc_test())) {
 		flash_prot_in_use = CHIP_BUSTYPE_LPC;
-		SD('L');
 		return;
-		}
-	SD('Z');
+	}
+	flash_portclear();
+	if ((allowed_protocols&CHIP_BUSTYPE_FWH)&&(fwh_test())) {
+		flash_prot_in_use = CHIP_BUSTYPE_FWH;
+		return;
+	}
 	flash_prot_in_use = 0;
 	return;
 }
@@ -93,6 +106,10 @@ static void spi_uninit_check(void)
 				case CHIP_BUSTYPE_LPC:
 					lpc_test();
 					break;
+
+				case CHIP_BUSTYPE_FWH:
+					fwh_test();
+					break;
 			}
 		}
 	}
@@ -108,6 +125,8 @@ uint8_t flash_read(uint32_t addr) {
 			return parallel_read(addr);
 		case CHIP_BUSTYPE_LPC:
 			return lpc_read_address(addr);
+		case CHIP_BUSTYPE_FWH:
+			return fwh_read_address(addr);
 		case CHIP_BUSTYPE_SPI:
 			return spi_read(addr);
 	}
@@ -127,6 +146,9 @@ void flash_readn(uint32_t addr, uint32_t len) {
 		case CHIP_BUSTYPE_LPC:
 			while (len--) SEND(lpc_read_address(addr++));
 			return;
+		case CHIP_BUSTYPE_FWH:
+			while (len--) SEND(fwh_read_address(addr++));
+			return;
 		case CHIP_BUSTYPE_SPI:
 			spi_readn(addr,len);
 			return;
@@ -144,6 +166,9 @@ void flash_write(uint32_t addr, uint8_t data) {
 			return;
 		case CHIP_BUSTYPE_LPC:
 			lpc_write_address(addr,data);
+			return;
+		case CHIP_BUSTYPE_FWH:
+			fwh_write_address(addr,data);
 			return;
 	}
 }

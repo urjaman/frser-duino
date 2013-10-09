@@ -19,16 +19,18 @@
 #include "main.h"
 #include "nibble.h"
 
-// 1 instruction is 83 ns, i think we wouldnt even need a single nop ever, but for safety, a nop.
+
+// 1 instruction is 83 ns, i think we can safely optimize delays out
+#if 0
 #define delay() asm("nop")
+#else
+#define delay()
+#endif
 
 #define FRAME_DDR			DDRC
 #define FRAME_PORT			PORTC
 #define FRAME				PC7
 
-#define CLK_DDR				DDRA
-#define CLK_PORT			PORTA
-#define CLK				PA0
 
 #define INIT_DDR			DDRA
 #define INIT_PORT			PORTA
@@ -42,8 +44,8 @@ void nibble_set_dir(uint8_t dir)
 	} else {
 		DDRC &= ~(0x03);
 		DDRD &= ~(0xC0);
-		PORTC &= ~(0x03);
-		PORTD &= ~(0xC0);
+		PORTC |= 0x03;
+		PORTD |= 0xC0;
 	}	
 }
 
@@ -61,23 +63,9 @@ void nibble_write(uint8_t data)
 	PORTD = ((PORTD & 0x3F) | ((data<<6) & 0xC0));
 }
 
-void clock_low(void)
-{
-	CLK_PORT &= ~_BV(CLK);
-	delay();
-}
+#define clock_low() do { CLK_PORT &= ~_BV(CLK); } while(0)
+#define clock_high() do { CLK_PORT |= _BV(CLK); } while(0)
 
-void clock_high(void)
-{
-	CLK_PORT |= _BV(CLK);
-	delay();
-}
-
-void clock_cycle(void)
-{
-	clock_low();
-	clock_high();
-}
 
 
 bool nibble_init(void)
@@ -144,7 +132,6 @@ bool nibble_ready_sync(void)
 	uint8_t nib;
 	uint8_t x=32;
 	do {
-		
 		nib = clocked_nibble_read();
 		if (!(x--)) return false;
 	} while (nib != 0);
@@ -159,8 +146,9 @@ uint8_t byte_read(void)
 
 void byte_write(uint8_t byte)
 {
-	clocked_nibble_write(byte & 0xf);
-	clocked_nibble_write(byte >> 4);
+	clocked_nibble_write(byte);
+	swap(byte);
+	clocked_nibble_write(byte);
 }
 
 void nibble_hw_init(void) {

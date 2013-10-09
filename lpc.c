@@ -1,6 +1,7 @@
 /*
-	This file is part of bbflash.
+	This file was part of bbflash, now frser-atmega644.
 	Copyright (C) 2013, Hao Liu and Robert L. Thompson
+	Copyright (C) 2013 Urja Rannikko <urjaman@gmail.com>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -37,17 +38,14 @@ void lpc_cleanup(void)
 	nibble_cleanup();
 }
 
+
 static void lpc_start(void)
 {
 	nibble_start(LPC_START);
 }
 
-static void lpc_nibble_write(uint8_t value)
-{
-	clocked_nibble_write(value);
-}
+#define lpc_nibble_write(v) clocked_nibble_write(v)
 
-#define swap(x) do { asm volatile("swap %0" : "=r" (x) : "0" (x)); } while(0)
 
 static void lpc_send_addr(uint32_t addr)
 {
@@ -62,21 +60,19 @@ static void lpc_send_addr(uint32_t addr)
 	a.l = addr;
 	/* NOTE: revise this if LPC_BL_ADDR changes. */
 	lpc_nibble_write(0xF);
-	lpc_nibble_write(0xF);
+	//lpc_nibble_write(0xF);
+	clock_cycle();
 	tmp = a.b[2];
 	swap(tmp);
 	lpc_nibble_write(tmp);
-	//swap(a.b[2]);
 	lpc_nibble_write(a.b[2]);
 	tmp = a.b[1];
 	swap(tmp);
 	lpc_nibble_write(tmp);
-	//swap(a.b[1]);
 	lpc_nibble_write(a.b[1]);
 	tmp = a.b[0];
 	swap(tmp);
 	lpc_nibble_write(tmp);
-//	swap(a.b[0]);
 	lpc_nibble_write(a.b[0]);
 #endif
 }
@@ -109,7 +105,6 @@ bool lpc_write_address(uint32_t addr, uint8_t byte)
 	if (!nibble_ready_sync())
 		return false;
 	clock_cycle();
-//	clock_cycle(lpc->clock);
 	return true;
 }
 

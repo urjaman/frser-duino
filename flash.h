@@ -32,7 +32,7 @@
 #ifdef FORCE_BUSTYPE
 #define SUPPORTED_BUSTYPES FORCE_BUSTYPE
 #else
-#define SUPPORTED_BUSTYPES (CHIP_BUSTYPE_PARALLEL|CHIP_BUSTYPE_LPC|CHIP_BUSTYPE_SPI)
+#define SUPPORTED_BUSTYPES (CHIP_BUSTYPE_PARALLEL|CHIP_BUSTYPE_LPC|CHIP_BUSTYPE_FWH|CHIP_BUSTYPE_SPI)
 #endif
 
 void flash_set_safe(void);
@@ -42,3 +42,4 @@ void flash_readn(uint32_t addr, uint32_t len);
 void flash_write(uint32_t addr, uint8_t data);
 void flash_spiop(uint32_t sbytes, uint32_t rbytes);
 uint8_t flash_get_proto(void);
+uint8_t flash_idle_clock(void);

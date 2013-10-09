@@ -20,6 +20,7 @@
 
 #include "main.h"
 #include "uart.h"
+#include "flash.h"
 
 /* This is 2s of our 16-bit timer. */
 #define UART_TIMEOUT (F_CPU/512)
@@ -78,12 +79,13 @@ static void uart_waiting(void) {
 	/* Since we have no timer interrupt ticking in the background, we currently
 	   cant go to sleep while waiting for UART data and have our no-data timeout work.
 	   I'm too lazy to fix this (since it is only a power usage thing...) */
+	uint8_t iclk = flash_idle_clock();
 	if (uart_timeout_jmp) {
 		uint16_t v = TCNT1;
 		if (v>UART_TIMEOUT) {
 			longjmp(*uart_timeout_jmp,1);
 		}
-	} else {
+	} else if (!iclk) { /* Only sleep if we _dont_ have a clock to toggle. */
 		/* In case of no timeout enabled, we can do a proper sleep though. */
 		cli();
 		if (uart_rcvwptr == uart_rcvrptr) { /* Race condition check */

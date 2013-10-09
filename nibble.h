@@ -22,6 +22,10 @@
 #define OUTPUT 1
 #define INPUT 0
 
+#define CLK_DDR				DDRA
+#define CLK_PORT			PORTA
+#define CLK				PA0
+
 bool nibble_init();
 void nibble_cleanup();
 void clocked_nibble_write(uint8_t value);
@@ -34,9 +38,7 @@ void nibble_hw_init(void);
 void nibble_set_dir(uint8_t dir);
 uint8_t nibble_read(void);
 void nibble_write(uint8_t data);
-void clock_low(void);
-void clock_high(void);
-void clock_cycle(void);
-
+#define clock_cycle() do { CLK_PORT &= ~_BV(CLK); asm("nop"); CLK_PORT |= _BV(CLK); asm("nop"); } while(0)
+#define swap(x) do { asm volatile("swap %0" : "=r" (x) : "0" (x)); } while(0)
 
 #endif /* NIBBLE_H_ */

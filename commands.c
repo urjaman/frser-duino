@@ -328,3 +328,32 @@ void bljump_cmd(void) {
 	_delay_ms(100);
 	btloader();
 }
+
+
+void flash_sproto_cmd(void)
+{
+	uint8_t p = SUPPORTED_BUSTYPES;
+	if (token_count==2) {
+		switch (tokenptrs[1][0]) {
+			default:
+				break;
+			case 's':
+			case 'S':
+				p = CHIP_BUSTYPE_SPI;
+				break;
+			case 'p':
+			case 'P':
+				p = CHIP_BUSTYPE_PARALLEL;
+				break;
+			case 'l':
+			case 'L':
+				p = CHIP_BUSTYPE_LPC;
+				break;
+			case 'f':
+			case 'F':
+				p = CHIP_BUSTYPE_FWH;
+				break;
+		}
+	}
+	flash_select_protocol(p);
+}

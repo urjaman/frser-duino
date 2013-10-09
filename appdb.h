@@ -38,3 +38,4 @@ void spi_test_cmd(void);
 void par_test_cmd(void);
 void lpc_test_cmd(void);
 void fwh_test_cmd(void);
+void flash_sproto_cmd(void);

@@ -22,6 +22,7 @@
 #include "flash.h"
 #include "parallel.h"
 #include "uart.h"
+#include "typeu.h"
 
 static uint8_t parallel_databus_read(void) {
 	uint8_t rv;
@@ -86,38 +87,35 @@ static void parallel_addrbus_safe(void) {  // turn off drivers on A13 and A11 - 
 
 
 static void parallel_setaddr(uint32_t addr) {
-	uint8_t ad_a,ad_b,ad_c,port; // split address to 8bit parts
-	asm(
-	"mov %0, %A3"	"\n\t"
-	"mov %1, %B3"	"\n\t"
-	"mov %2, %C3"	"\n\t"
-	: "=r" (ad_a), "=r" (ad_b), "=r" (ad_c) : "r" (addr) );
+	uint8_t port; // split address to 8bit parts
+	u32_u a;
+	a.l = addr;
 	port = PORTA;
-	parallel_pinmapper(port,ad_c,1,17-16);
-	parallel_pinmapper(port,ad_b,2,14 -8);
-	parallel_pinmapper(port,ad_b,3,13 -8);
-	parallel_pinmapper(port,ad_b,4, 8 -8);
-	parallel_pinmapper(port,ad_b,5, 9 -8);
-	parallel_pinmapper(port,ad_b,6,11 -8);
+	parallel_pinmapper(port,a.b[2],1,17-16);
+	parallel_pinmapper(port,a.b[1],2,14 -8);
+	parallel_pinmapper(port,a.b[1],3,13 -8);
+	parallel_pinmapper(port,a.b[1],4, 8 -8);
+	parallel_pinmapper(port,a.b[1],5, 9 -8);
+	parallel_pinmapper(port,a.b[1],6,11 -8);
 	PORTA = port;
 	//port = 0; (all bits are set via bld, no need to clear)
-	parallel_pinmapper(port,ad_c,0,18-16);
-	parallel_pinmapper(port,ad_c,1,16-16);
-	parallel_pinmapper(port,ad_b,2,15 -8);
-	parallel_pinmapper(port,ad_b,3,12 -8);
-	parallel_pinmapper(port,ad_a,4, 7 -0);
-	parallel_pinmapper(port,ad_a,5, 6 -0);
-	parallel_pinmapper(port,ad_a,6, 5 -0);
-	parallel_pinmapper(port,ad_a,7, 4 -0);
+	parallel_pinmapper(port,a.b[2],0,18-16);
+	parallel_pinmapper(port,a.b[2],1,16-16);
+	parallel_pinmapper(port,a.b[1],2,15 -8);
+	parallel_pinmapper(port,a.b[1],3,12 -8);
+	parallel_pinmapper(port,a.b[0],4, 7 -0);
+	parallel_pinmapper(port,a.b[0],5, 6 -0);
+	parallel_pinmapper(port,a.b[0],6, 5 -0);
+	parallel_pinmapper(port,a.b[0],7, 4 -0);
 	PORTB = port;
 	port = PORTC;
-	parallel_pinmapper(port,ad_b,7,10 -8);
+	parallel_pinmapper(port,a.b[1],7,10 -8);
 	PORTC = port;
 	port = PORTD;
-	parallel_pinmapper(port,ad_a,2, 3 -0);
-	parallel_pinmapper(port,ad_a,3, 2 -0);
-	parallel_pinmapper(port,ad_a,4, 1 -0);
-	parallel_pinmapper(port,ad_a,5, 0 -0);
+	parallel_pinmapper(port,a.b[0],2, 3 -0);
+	parallel_pinmapper(port,a.b[0],3, 2 -0);
+	parallel_pinmapper(port,a.b[0],4, 1 -0);
+	parallel_pinmapper(port,a.b[0],5, 0 -0);
 	PORTD = port;
 }
 

@@ -142,7 +142,6 @@ void nibble_start(uint8_t start)
 bool nibble_ready_sync(void)
 {
 	uint8_t nib;
-	TCNT1 = 0;
 	uint8_t x=32;
 	do {
 		

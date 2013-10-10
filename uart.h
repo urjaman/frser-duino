@@ -33,7 +33,7 @@ uint8_t uart_peek(void);
 #define PEEK() uart_peek()
 #define RECEIVE() uart_recv()
 #define SEND(n) uart_send(n)
-#define UART_BUFLEN 1024
+#define UART_BUFLEN 1280
 // At high speed polled TX is faster than interrupt TX
 #if BAUD > 115200
 #define UART_POLLED_TX

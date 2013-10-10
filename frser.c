@@ -47,11 +47,14 @@ struct constanswer {
 #define KBPSEC ((BYTERATE+512)/1024)
 #define RDNMAX (KBPSEC*1024)
 
+/* Report -16 since.. ??? */
+#define UART_RBUFLEN (UART_BUFLEN-16)
+
 const char PROGMEM ca_nop[1] = { S_ACK };
 const char PROGMEM ca_iface[3] = { S_ACK,0x01,0x00 };
 const char PROGMEM ca_bitmap[33] = { S_ACK, 0xFF, 0xFF, 0x7F };
 const char PROGMEM ca_pgmname[17] = { S_ACK, 'A','T','M','e','g','a','6','4','4',' ','U','S','B' }; /* An ATMega644 FTDI USB device */
-const char PROGMEM ca_serbuf[3] = { S_ACK, UART_BUFLEN&0xFF, (UART_BUFLEN>>8)&0xFF };
+const char PROGMEM ca_serbuf[3] = { S_ACK, (UART_RBUFLEN)&0xFF, (UART_RBUFLEN>>8)&0xFF };
 const char PROGMEM ca_bustypes[2] = { S_ACK, SUPPORTED_BUSTYPES };
 const char PROGMEM ca_chipsize[2] = { S_ACK, 19 };
 const char PROGMEM ca_opbufsz[3] = { S_ACK, S_OPBUFLEN&0xFF, (S_OPBUFLEN>>8)&0xFF };

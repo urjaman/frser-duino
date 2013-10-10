@@ -20,12 +20,8 @@
 #include "nibble.h"
 
 
-// 1 instruction is 83 ns, i think we can safely optimize delays out
-#if 0
+// 1 instruction is 83 ns, there is one place where we know we need a delay()...
 #define delay() asm("nop")
-#else
-#define delay()
-#endif
 
 #define FRAME_DDR			DDRC
 #define FRAME_PORT			PORTC
@@ -104,14 +100,13 @@ void clocked_nibble_write(uint8_t value)
 {
 	clock_low();
 	nibble_write(value);
-	delay();
 	clock_high();
-	delay();
 }
 
 uint8_t clocked_nibble_read(void)
 {
 	clock_cycle();
+	delay();
 	return nibble_read();
 }
 
@@ -124,7 +119,6 @@ void nibble_start(uint8_t start)
 	nibble_write(start);
 	clock_cycle();
 	FRAME_PORT |= _BV(FRAME);
-	delay();
 }
 
 bool nibble_ready_sync(void)

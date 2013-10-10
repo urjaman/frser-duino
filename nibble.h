@@ -38,7 +38,7 @@ void nibble_hw_init(void);
 void nibble_set_dir(uint8_t dir);
 uint8_t nibble_read(void);
 void nibble_write(uint8_t data);
-#define clock_cycle() do { CLK_PORT &= ~_BV(CLK); asm("nop"); CLK_PORT |= _BV(CLK); asm("nop"); } while(0)
+#define clock_cycle() do { CLK_PORT &= ~_BV(CLK); CLK_PORT |= _BV(CLK); } while(0)
 #define swap(x) do { asm volatile("swap %0" : "=r" (x) : "0" (x)); } while(0)
 
 #endif /* NIBBLE_H_ */

@@ -171,15 +171,11 @@ uint8_t spi_probe_res(uint8_t *id) {
 
 uint8_t spi_test(void) {
 	spi_init();
-#if 0
-	return 1;
-#else
 	if (spi_probe_rdid(NULL)) return 1;
 	if (spi_probe_rems(NULL)) return 1;
 	if (spi_probe_res(NULL)) return 1;
 	spi_uninit();
 	return 0;
-#endif
 }
 
 uint8_t spi_read(uint32_t addr) {

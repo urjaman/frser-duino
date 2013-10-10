@@ -53,6 +53,12 @@ uint8_t nibble_read(void)
 	return rv;
 }
 
+static void nibble_write_hi(uint8_t data)
+{
+	PORTC = ((PORTC & 0xFC) | ((data>>6) & 0x03));
+	PORTD = ((PORTD & 0x3F) | ((data<<2) & 0xC0));
+}
+
 void nibble_write(uint8_t data)
 {
 	PORTC = ((PORTC & 0xFC) | ((data>>2) & 0x03));
@@ -103,6 +109,13 @@ void clocked_nibble_write(uint8_t value)
 	clock_high();
 }
 
+void clocked_nibble_write_hi(uint8_t value)
+{
+	clock_low();
+	nibble_write_hi(value);
+	clock_high();
+}
+
 uint8_t clocked_nibble_read(void)
 {
 	clock_cycle();
@@ -141,8 +154,7 @@ uint8_t byte_read(void)
 void byte_write(uint8_t byte)
 {
 	clocked_nibble_write(byte);
-	swap(byte);
-	clocked_nibble_write(byte);
+	clocked_nibble_write_hi(byte);
 }
 
 void nibble_hw_init(void) {

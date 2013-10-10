@@ -45,6 +45,7 @@ static void lpc_start(void)
 }
 
 #define lpc_nibble_write(v) clocked_nibble_write(v)
+#define lpc_nibble_write_hi(v) clocked_nibble_write_hi(v)
 
 
 static void lpc_send_addr(uint32_t addr)
@@ -55,24 +56,17 @@ static void lpc_send_addr(uint32_t addr)
 	for (i = 28; i >= 0; i -= 4)
 		lpc_nibble_write((addr >> i) & 0xf);
 #else
-	uint8_t tmp;
 	u32_u a;
 	a.l = addr;
 	/* NOTE: revise this if LPC_BL_ADDR changes. */
 	lpc_nibble_write(0xF);
 	//lpc_nibble_write(0xF);
 	clock_cycle();
-	tmp = a.b[2];
-	swap(tmp);
-	lpc_nibble_write(tmp);
+	lpc_nibble_write_hi(a.b[2]);
 	lpc_nibble_write(a.b[2]);
-	tmp = a.b[1];
-	swap(tmp);
-	lpc_nibble_write(tmp);
+	lpc_nibble_write_hi(a.b[1]);
 	lpc_nibble_write(a.b[1]);
-	tmp = a.b[0];
-	swap(tmp);
-	lpc_nibble_write(tmp);
+	lpc_nibble_write_hi(a.b[0]);
 	lpc_nibble_write(a.b[0]);
 #endif
 }

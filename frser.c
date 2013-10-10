@@ -25,6 +25,7 @@
 #include "spi.h"	
 #include "frser.h"
 #include "ciface.h"
+#include "typeu.h"
 
 // Sys_bytes = stack + bss vars.
 #define SYS_BYTES 320
@@ -113,11 +114,12 @@ static uint8_t opbuf_addbyte(uint8_t c) {
 }
 
 static uint32_t buf2u24(uint8_t *buf) {
-	uint32_t u24;
-	u24  = (((uint32_t)buf[0])<< 0);
-	u24 |= (((uint32_t)buf[1])<< 8);
-	u24 |= (((uint32_t)buf[2])<<16);
-	return u24;
+	u32_u u24;
+	u24.b[0] = buf[0];
+	u24.b[1] = buf[1];
+	u24.b[2] = buf[2];
+	u24.b[3] = 0;
+	return u24.l;
 }
 
 static void do_cmd_spiop(uint8_t *parbuf) {
@@ -145,21 +147,22 @@ static void do_cmd_pin_state(uint8_t v) {
 }
 
 static void do_cmd_spispeed(uint8_t* parbuf) {
-	uint32_t hz;
-	hz  = (((uint32_t)(parbuf[0]))     );
-	hz |= (((uint32_t)(parbuf[1])) << 8);
-	hz |= (((uint32_t)(parbuf[2])) << 16);
-	hz |= (((uint32_t)(parbuf[3])) << 24);
-	if (hz==0) { /* I think this spec is stupid. /UR */
+	u32_u hz;
+	hz.b[0] = parbuf[0];
+	hz.b[1] = parbuf[1];
+	hz.b[2] = parbuf[2];
+	hz.b[3] = parbuf[3];
+	if (hz.l==0) { /* I think this spec is stupid. /UR */
 		SEND(S_NAK);
 		return;
 	}
-	uint32_t new_hz = spi_set_speed(hz);
+	u32_u new_hz;
+	new_hz.l = spi_set_speed(hz.l);
 	SEND(S_ACK);
-	SEND((new_hz    )&0xFF);
-	SEND((new_hz>> 8)&0xFF);
-	SEND((new_hz>>16)&0xFF);
-	SEND((new_hz>>24)&0xFF);
+	SEND(new_hz.b[0]);
+	SEND(new_hz.b[1]);
+	SEND(new_hz.b[2]);
+	SEND(new_hz.b[3]);
 }
 
 static void do_cmd_readbyte(uint8_t *parbuf) {
@@ -278,30 +281,30 @@ static void do_cmd_opbuf_exec(void) {
 			continue;
 		}
 		if (op == OPBUF_DELAYOP) {
-			uint32_t usecs;
-			usecs  = (((uint32_t)(opbuf[readptr++])) << 0);
-			usecs |= (((uint32_t)(opbuf[readptr++])) << 8);
-			usecs |= (((uint32_t)(opbuf[readptr++])) << 16);
-			usecs |= (((uint32_t)(opbuf[readptr++])) << 24);
+			u32_u usecs;
+			usecs.b[0] = opbuf[readptr++];
+			usecs.b[1] = opbuf[readptr++];
+			usecs.b[2] = opbuf[readptr++];
+			usecs.b[3] = opbuf[readptr++];
 			if (readptr > opbuf_bytes) goto nakret;
-			udelay(usecs);
+			udelay(usecs.l);
 			continue;
 		}
 		if (op == OPBUF_TOGGLERDY) {
 			uint8_t tmp1, tmp2;
 			uint32_t i = 0;
-			uint32_t usecs;
-			usecs  = (((uint32_t)(opbuf[readptr++])) << 0);
-			usecs |= (((uint32_t)(opbuf[readptr++])) << 8);
-			usecs |= (((uint32_t)(opbuf[readptr++])) << 16);
-			usecs |= (((uint32_t)(opbuf[readptr++])) << 24);
+			u32_u usecs;
+			usecs.b[0] = opbuf[readptr++];
+			usecs.b[1] = opbuf[readptr++];
+			usecs.b[2] = opbuf[readptr++];
+			usecs.b[3] = opbuf[readptr++];
 			if (readptr > opbuf_bytes) goto nakret;
 			uint32_t addr = buf2u24(opbuf+readptr);
 			readptr += 3;
 			if (readptr > opbuf_bytes) goto nakret;
 		        tmp1 = flash_read(addr) & 0x40;
 		        while (i++ < 0xFFFFFFF) {
-		                if (usecs) udelay(usecs);
+		                if (usecs.l) udelay(usecs.l);
 		                tmp2 = flash_read(addr) & 0x40;
                 		if (tmp1 == tmp2) {
 		                        break;

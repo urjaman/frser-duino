@@ -29,6 +29,7 @@
 bool nibble_init();
 void nibble_cleanup();
 void clocked_nibble_write(uint8_t value);
+void clocked_nibble_write_hi(uint8_t value);
 uint8_t clocked_nibble_read();
 void nibble_start(uint8_t start);
 bool nibble_ready_sync();

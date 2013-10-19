@@ -63,6 +63,30 @@ uint8_t flash_idle_clock(void) {
 	return 0;
 }
 
+uint8_t flash_plausible_protocols(void) {
+	uint8_t protocols = SUPPORTED_BUSTYPES;
+	flash_portclear();
+	if (spi_test()) {
+		// 0 or SPI, because using parallel while SPI chip is attached is potentially dangerous.
+		protocols &= CHIP_BUSTYPE_SPI;
+		return protocols;
+	}
+	flash_portclear();
+	if ((protocols&CHIP_BUSTYPE_PARALLEL)&&(!parallel_test())) {
+		protocols &= ~CHIP_BUSTYPE_PARALLEL;
+	}
+	flash_portclear();
+	if ((protocols&CHIP_BUSTYPE_LPC)&&(!lpc_test())) {
+		protocols &= ~CHIP_BUSTYPE_LPC;
+	}
+	flash_portclear();
+	if ((protocols&CHIP_BUSTYPE_FWH)&&(!fwh_test())) {
+		protocols &= ~CHIP_BUSTYPE_FWH;
+	}
+	flash_select_protocol(flash_prot_in_use);
+	return protocols;
+}
+
 void flash_select_protocol(uint8_t allowed_protocols) {
 	allowed_protocols &= SUPPORTED_BUSTYPES;
 	flash_portclear();

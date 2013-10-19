@@ -55,7 +55,7 @@ const char PROGMEM ca_iface[3] = { S_ACK,0x01,0x00 };
 const char PROGMEM ca_bitmap[33] = { S_ACK, 0xFF, 0xFF, 0x7F };
 const char PROGMEM ca_pgmname[17] = { S_ACK, 'A','T','M','e','g','a','6','4','4',' ','U','S','B' }; /* An ATMega644 FTDI USB device */
 const char PROGMEM ca_serbuf[3] = { S_ACK, (UART_RBUFLEN)&0xFF, (UART_RBUFLEN>>8)&0xFF };
-const char PROGMEM ca_bustypes[2] = { S_ACK, SUPPORTED_BUSTYPES };
+/* const char PROGMEM ca_bustypes[2] = { S_ACK, SUPPORTED_BUSTYPES }; */
 const char PROGMEM ca_chipsize[2] = { S_ACK, 19 };
 const char PROGMEM ca_opbufsz[3] = { S_ACK, S_OPBUFLEN&0xFF, (S_OPBUFLEN>>8)&0xFF };
 const char PROGMEM ca_wrnlen[4] = { S_ACK, 0x00, 0x01, 0x00 };
@@ -69,7 +69,7 @@ const struct constanswer PROGMEM const_table[S_MAXCMD+1] = {
 	{ 33, ca_bitmap },	// op bitmap
 	{ 17, ca_pgmname },	// programmer name
 	{ 3, ca_serbuf },	// serial buffer size
-	{ 2, ca_bustypes },	// bustypes
+	{ 0, NULL },		// bustypes
 	{ 2, ca_chipsize },	// chip size
 	{ 3, ca_opbufsz },	// operation buffer size
 	{ 4, ca_wrnlen },	// write-n max len
@@ -386,6 +386,11 @@ void frser_main(void) {
 			case S_CMD_R_NBYTES:
 				do_cmd_readnbytes(parbuf);
 				break;
+			case S_CMD_Q_BUSTYPE: /* Dynamic bus types. */
+				SEND(S_ACK);
+				SEND(flash_plausible_protocols());
+				break;
+
 			case S_CMD_O_INIT:
 				SEND(S_ACK);
 				opbuf_bytes = 0;

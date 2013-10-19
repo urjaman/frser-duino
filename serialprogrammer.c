@@ -188,7 +188,7 @@ int main(int argc, char * argv[]) {
 	if (bljump_baud) {
 		set_baudrate(devfd,bljump_baud);
 		printf("Doing BLJUMP (baud=%d).\n",bljump_baud);
-		const char* cmd = "     BLJUMP\r\n";
+		const char* cmd = "                         BLJUMP\r\n";
 		dev_write(devfd,cmd,strlen(cmd));
 		tcdrain(devfd);
 		set_baudrate(devfd,115200);

@@ -103,9 +103,11 @@ const uint8_t PROGMEM op2len[S_MAXCMD+1] = { /* A table to get  parameter length
 static uint8_t last_set_bus_types = SUPPORTED_BUSTYPES;
 static uint8_t last_set_pin_state = 1;
 
-#define OPBUF_WRITEOP 0x00
-#define OPBUF_DELAYOP 0x01
-#define OPBUF_TOGGLERDY 0x02
+#define OPBUF_WRITENOP 0x00
+#define OPBUF_WRITE1OP 0x01
+#define OPBUF_DELAYOP 0x02
+#define OPBUF_TOGGLERDY 0x03
+
 static uint8_t opbuf[S_OPBUFLEN];
 static uint16_t opbuf_bytes = 0;
 
@@ -186,8 +188,7 @@ static void do_cmd_readnbytes(uint8_t *parbuf) {
 }
 
 static void do_cmd_opbuf_writeb(uint8_t *parbuf) {
-	if (opbuf_addbyte(OPBUF_WRITEOP)) goto nakret;
-	if (opbuf_addbyte(1)) goto nakret;
+	if (opbuf_addbyte(OPBUF_WRITE1OP)) goto nakret;
 	if (opbuf_addbyte(parbuf[0])) goto nakret;
 	if (opbuf_addbyte(parbuf[1])) goto nakret;
 	if (opbuf_addbyte(parbuf[2])) goto nakret;
@@ -238,7 +239,7 @@ static void do_cmd_opbuf_writen(void) {
 	len = RECEIVE();
 	RECEIVE();
 	RECEIVE();
-	if (opbuf_addbyte(OPBUF_WRITEOP)) goto nakret;
+	if (opbuf_addbyte(OPBUF_WRITENOP)) goto nakret;
 	if (opbuf_addbyte(len)) goto nakret;
 	plen--; if (opbuf_addbyte(RECEIVE())) goto nakret;
 	plen--; if (opbuf_addbyte(RECEIVE())) goto nakret;
@@ -264,11 +265,15 @@ static void do_cmd_opbuf_exec(void) {
 		uint8_t op;
 		op = opbuf[readptr++];
 		if (readptr >= opbuf_bytes) goto nakret;
-		if (op == OPBUF_WRITEOP) {
+		if ((op == OPBUF_WRITE1OP)||(op==OPBUF_WRITENOP)) {
 			uint32_t addr;
 			uint8_t len,i;
-			len = opbuf[readptr++];
-			if (readptr >= opbuf_bytes) goto nakret;
+			if (op==OPBUF_WRITENOP) {
+				len = opbuf[readptr++];
+				if (readptr >= opbuf_bytes) goto nakret;
+			} else {
+				len = 1;
+			}
 			addr = buf2u24(opbuf+readptr);
 			readptr += 3;
 			if (readptr >= opbuf_bytes) goto nakret;

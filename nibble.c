@@ -42,7 +42,7 @@ void nibble_set_dir(uint8_t dir)
 		DDRD &= ~(0xC0);
 		PORTC |= 0x03;
 		PORTD |= 0xC0;
-	}	
+	}
 }
 
 uint8_t nibble_read(void)

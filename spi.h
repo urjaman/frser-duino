@@ -22,7 +22,7 @@ uint8_t spi_test(void);
 uint8_t spi_read(uint32_t addr);
 void spi_readn(uint32_t addr, uint32_t len);
 void spi_spiop(uint32_t sbytes, uint32_t rbytes);
-int spi_uninit(void);
+uint8_t spi_uninit(void);
 void spi_init_cond(void);
 uint32_t spi_set_speed(uint32_t hz);
 uint8_t spi_probe_rdid(uint8_t *id);

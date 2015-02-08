@@ -88,7 +88,7 @@ void spi_init_cond(void) {
 	if (!spi_initialized) spi_init();
 }
 
-int spi_uninit(void) {
+uint8_t spi_uninit(void) {
 	if (spi_initialized) {
 		UCSR1C = 0;
 		spi_initialized = 0;

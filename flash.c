@@ -66,6 +66,8 @@ uint8_t flash_idle_clock(void) {
 uint8_t flash_plausible_protocols(void) {
 	uint8_t protocols = SUPPORTED_BUSTYPES;
 	flash_portclear();
+	/* Note: spi_test==1 is trustworthy, parallel_test==0 is trustworthy, lpc_test is trustworthy, fwh_test is trustworthy. */
+	/* In other words, spi_test==0 is not trustworthy, and parallel_test==1 is not trustworthy. */
 	if (spi_test()) {
 		// 0 or SPI, because using parallel while SPI chip is attached is potentially dangerous.
 		protocols &= CHIP_BUSTYPE_SPI;
@@ -76,12 +78,20 @@ uint8_t flash_plausible_protocols(void) {
 		protocols &= ~CHIP_BUSTYPE_PARALLEL;
 	}
 	flash_portclear();
-	if ((protocols&CHIP_BUSTYPE_LPC)&&(!lpc_test())) {
-		protocols &= ~CHIP_BUSTYPE_LPC;
+	if (protocols&CHIP_BUSTYPE_LPC) {
+		if (!lpc_test()) {
+			protocols &= ~CHIP_BUSTYPE_LPC;
+		} else { // if lpc test passes, it certainly is not SPI chip that is attached.
+			protocols &= ~CHIP_BUSTYPE_SPI;
+		}
 	}
 	flash_portclear();
-	if ((protocols&CHIP_BUSTYPE_FWH)&&(!fwh_test())) {
-		protocols &= ~CHIP_BUSTYPE_FWH;
+	if (protocols&CHIP_BUSTYPE_FWH) {
+		if (!fwh_test()) {
+			protocols &= ~CHIP_BUSTYPE_FWH;
+		} else { // Same here, if fwh then not spi.
+			protocols &= ~CHIP_BUSTYPE_SPI;
+		}
 	}
 	flash_select_protocol(flash_prot_in_use);
 	return protocols;

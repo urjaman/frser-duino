@@ -36,10 +36,10 @@ static void flash_portclear(void) {
 	DDRB=0;
 	DDRC=0;
 	DDRD=0;
-	PORTA=0;
-	PORTB=0;
-	PORTC=0;
-	PORTD=0;
+	PORTA=0xFF;
+	PORTB=0xFF;
+	PORTC=0xFF;
+	PORTD=0xFF;
 }
 
 void flash_set_safe(void) {

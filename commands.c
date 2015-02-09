@@ -175,7 +175,7 @@ unsigned int identify_flash(void) {
 	unsigned int rv;
 	unsigned char device;
 	unsigned char vendor;
-	
+
 	flash_write(0x5555,0xAA);
 	_delay_us(10);
 	flash_write(0x2AAA,0x55);

@@ -38,21 +38,21 @@ uint32_t spi_set_speed(uint32_t hz) {
 		spi_set_ubrr = 255;
 		return F_CPU/512;
 	}
-	
+
 	uint32_t bdiv = hz*2;
 	uint32_t ubrr_vp = (F_CPU / bdiv)-1;
 	// If the division is not perfect, increase the result (round down).
 	if (F_CPU%bdiv) ubrr_vp++;
 
 	spi_set_ubrr = ubrr_vp;
-	
+
 	uint32_t new_hz = F_CPU / ((ubrr_vp+1)*2);
 	return new_hz;
 }
 
 static void spi_select(void) {
 	UBRR1 = 0;
-	UCSR1B = _BV(TXEN1)|_BV(RXEN1); 
+	UCSR1B = _BV(TXEN1)|_BV(RXEN1);
 	UBRR1 = (uint16_t)spi_set_ubrr;
 	PORTB &= ~_BV(4);
 	DDRB |= _BV(4);
@@ -69,7 +69,7 @@ static uint8_t spi_txrx(const uint8_t c) {
 	return UDR1;
 }
 
-	
+
 static void spi_init(void) {
 	PORTB |= _BV(3)|_BV(4);
 	DDRB |= _BV(3)|_BV(4); // !WP&!CS high
@@ -96,7 +96,7 @@ uint8_t spi_uninit(void) {
 	}
 	return 0;
 }
-	
+
 
 static void spi_localop_start(uint8_t sbytes, const uint8_t* sarr) {
 	uint8_t i;

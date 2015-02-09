@@ -136,7 +136,7 @@ static void spi_uninit_check(void)
 				case CHIP_BUSTYPE_PARALLEL:
 					parallel_test();
 					break;
-				
+
 				case CHIP_BUSTYPE_LPC:
 					lpc_test();
 					break;

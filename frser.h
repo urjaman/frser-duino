@@ -55,3 +55,4 @@ void frser_main(void) __attribute__((noreturn));
 /* The maximum static length of parameters (poll_dly)) */
 #define S_MAXLEN 0x08
 
+uint8_t get_last_op(void);

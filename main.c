@@ -23,8 +23,15 @@
 #include "flash.h"
 #include "frser.h"
 
+static uint8_t rst_reason;
+uint8_t get_rst_reason(void) {
+	return rst_reason;
+}
+
 int main(void) {
 	cli();
+	rst_reason = MCUSR;
+	MCUSR = 0;
 	uart_init();
 	power_adc_disable();
 	power_timer0_disable();

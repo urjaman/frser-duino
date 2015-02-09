@@ -39,3 +39,4 @@ void par_test_cmd(void);
 void lpc_test_cmd(void);
 void fwh_test_cmd(void);
 void flash_sproto_cmd(void);
+void frser_last_op_cmd(void);

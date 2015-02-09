@@ -30,6 +30,7 @@
 #include "parallel.h"
 #include "lpc.h"
 #include "fwh.h"
+#include "frser.h"
 
 static void sendcrlf(void) {
 	sendstr_P(PSTR("\r\n"));
@@ -167,6 +168,13 @@ void help_cmd(void) {
 		sendstr_P(name);
 		SEND(' ');
 	}
+}
+
+uint8_t get_rst_reason(void);
+
+void frser_last_op_cmd(void) {
+	luint2outdual(get_last_op());
+	luint2outdual(get_rst_reason());
 }
 
 

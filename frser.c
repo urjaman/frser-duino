@@ -38,6 +38,10 @@ struct constanswer {
 	PGM_P data;
 } __attribute__ ((__packed__));
 
+static uint8_t last_op = 0xfe;
+uint8_t get_last_op(void) {
+	return last_op;
+}
 
 /* Calculate a nice read-n max value so that it doesnt hurt performance, but
    doesnt allow the device to be accidentally left in an "infini-tx" mode.
@@ -391,7 +395,7 @@ void frser_main(void) {
 			SEND(S_NAK); /* Tell of a problem. */
 			continue;
 		}
-
+		last_op = op;
 		a_len = pgm_read_byte(&(const_table[op].len));
 		/* These are the simple query-like operations, we just reply from ProgMem: */
 		/* NOTE: Operations that have a const answer cannot have parameters !!!    */

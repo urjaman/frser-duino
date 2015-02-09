@@ -207,7 +207,7 @@ void flash_write(uint32_t addr, uint8_t data) {
 	}
 }
 
-	
+
 void flash_spiop(uint32_t sbytes, uint32_t rbytes) {
 	if ((SUPPORTED_BUSTYPES) & CHIP_BUSTYPE_SPI) {
 		spi_init_cond();

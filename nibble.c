@@ -32,8 +32,7 @@
 #define INIT_PORT			PORTA
 #define INIT				PA7
 
-void nibble_set_dir(uint8_t dir)
-{
+void nibble_set_dir(uint8_t dir) {
 	if (dir) {
 		DDRC |= 0x03;
 		DDRD |= 0xC0;
@@ -45,22 +44,19 @@ void nibble_set_dir(uint8_t dir)
 	}
 }
 
-uint8_t nibble_read(void)
-{
+uint8_t nibble_read(void) {
 	uint8_t rv;
 	rv = (PINC & 0x03)<<2;
 	rv |= (PIND & 0xC0)>>6;
 	return rv;
 }
 
-static void nibble_write_hi(uint8_t data)
-{
+static void nibble_write_hi(uint8_t data) {
 	PORTC = ((PORTC & 0xFC) | ((data>>6) & 0x03));
 	PORTD = ((PORTD & 0x3F) | ((data<<2) & 0xC0));
 }
 
-void nibble_write(uint8_t data)
-{
+void nibble_write(uint8_t data) {
 	PORTC = ((PORTC & 0xFC) | ((data>>2) & 0x03));
 	PORTD = ((PORTD & 0x3F) | ((data<<6) & 0xC0));
 }
@@ -70,8 +66,7 @@ void nibble_write(uint8_t data)
 
 
 
-bool nibble_init(void)
-{
+bool nibble_init(void) {
 	uint8_t i;
 
 	INIT_DDR |= _BV(INIT);
@@ -81,7 +76,7 @@ bool nibble_init(void)
 	CLK_PORT |= _BV(CLK);
 
 	FRAME_DDR |= _BV(FRAME);
-	FRAME_PORT |=  _BV(FRAME);	
+	FRAME_PORT |=  _BV(FRAME);
 
 	nibble_set_dir(OUTPUT);
 	nibble_write(0);
@@ -95,36 +90,31 @@ bool nibble_init(void)
 	return true;
 }
 
-void nibble_cleanup(void)
-{
+void nibble_cleanup(void) {
 	CLK_DDR &= ~_BV(CLK);
 	FRAME_DDR &= ~_BV(FRAME);
 	nibble_set_dir(INPUT);
 }
 
-void clocked_nibble_write(uint8_t value)
-{
+void clocked_nibble_write(uint8_t value) {
 	clock_low();
 	nibble_write(value);
 	clock_high();
 }
 
-void clocked_nibble_write_hi(uint8_t value)
-{
+void clocked_nibble_write_hi(uint8_t value) {
 	clock_low();
 	nibble_write_hi(value);
 	clock_high();
 }
 
-uint8_t clocked_nibble_read(void)
-{
+uint8_t clocked_nibble_read(void) {
 	clock_cycle();
 	delay();
 	return nibble_read();
 }
 
-void nibble_start(uint8_t start)
-{
+void nibble_start(uint8_t start) {
 	FRAME_PORT |= _BV(FRAME);
 	nibble_set_dir(OUTPUT);
 	clock_high();
@@ -134,8 +124,7 @@ void nibble_start(uint8_t start)
 	FRAME_PORT |= _BV(FRAME);
 }
 
-bool nibble_ready_sync(void)
-{
+bool nibble_ready_sync(void) {
 	uint8_t nib;
 	uint8_t x=32;
 	do {
@@ -145,14 +134,12 @@ bool nibble_ready_sync(void)
 	return true;
 }
 
-uint8_t byte_read(void)
-{
+uint8_t byte_read(void) {
 	return clocked_nibble_read()
 	| (clocked_nibble_read() << 4);
 }
 
-void byte_write(uint8_t byte)
-{
+void byte_write(uint8_t byte) {
 	clocked_nibble_write(byte);
 	clocked_nibble_write_hi(byte);
 }

@@ -52,7 +52,7 @@ static void parallel_chip_enable(void) {
 
 
 /*static void parallel_chip_disable(void) {
-	PORTC |= _BV(6); 
+	PORTC |= _BV(6);
 }*/
 
 static void parallel_output_enable(void) {
@@ -73,11 +73,11 @@ static void parallel_addrbus_out(void) {
 	DDRC |= _BV(7);
 	// pd2345
 	DDRD |= (_BV(2)|_BV(3)|_BV(4)|_BV(5));
-	}
+}
 
 static void parallel_addrbus_safe(void) {  // turn off drivers on A13 and A11 - safe to attach FWH/LPC chips
 	DDRA &= ~(_BV(3)|_BV(6));
-	}
+}
 
 #define parallel_pinmapper(to,from,bit_to,bit_from) \
 	asm ( "bst %1, " #bit_from "\n\t" \
@@ -151,7 +151,7 @@ uint8_t parallel_test(void) {
 	uint8_t x=(F_CPU/1000000); // This results in 5microsecond maximum pullup wait since the loop is 5 cycles
 	do {
 		if (PINA&_BV(3)) goto okexit; // Pullup works => parallel
-	} while (--x); 
+	} while (--x);
 	PORTA &= ~_BV(3); // A13 to zero (GND)
 	PORTA |= _BV(6);  // A11 to one (Vcc)
 	DDRA |= _BV(3);
@@ -166,14 +166,14 @@ void parallel_readn(uint32_t addr, uint32_t len) {
 	if (parallel_test()) {
 		parallel_read_init();
 		do {
-		SEND(parallel_readcycle(addr++));
+			SEND(parallel_readcycle(addr++));
 		} while(--len);
 		// safety features
 		parallel_output_disable();
 		parallel_addrbus_safe();
 	} else {
 		do {
-		SEND(0xFF);
+			SEND(0xFF);
 		} while(--len);
 	}
 }

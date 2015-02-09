@@ -28,19 +28,16 @@
 
 #define LPC_BL_ADDR 0xff000000
 
-bool lpc_init(void)
-{
+bool lpc_init(void) {
 	return nibble_init();
 }
 
-void lpc_cleanup(void)
-{
+void lpc_cleanup(void) {
 	nibble_cleanup();
 }
 
 
-static void lpc_start(void)
-{
+static void lpc_start(void) {
 	nibble_start(LPC_START);
 }
 
@@ -48,8 +45,7 @@ static void lpc_start(void)
 #define lpc_nibble_write_hi(v) clocked_nibble_write_hi(v)
 
 
-static void lpc_send_addr(uint32_t addr)
-{
+static void lpc_send_addr(uint32_t addr) {
 #if 0
 	int8_t i;
 	addr |= LPC_BL_ADDR;
@@ -71,8 +67,7 @@ static void lpc_send_addr(uint32_t addr)
 #endif
 }
 
-int lpc_read_address(uint32_t addr)
-{
+int lpc_read_address(uint32_t addr) {
 	lpc_start();
 	lpc_nibble_write(LPC_CYCTYPE_READ);
 	lpc_send_addr(addr);
@@ -87,8 +82,7 @@ int lpc_read_address(uint32_t addr)
 	return byte;
 }
 
-bool lpc_write_address(uint32_t addr, uint8_t byte)
-{
+bool lpc_write_address(uint32_t addr, uint8_t byte) {
 	lpc_start();
 	lpc_nibble_write(LPC_CYCTYPE_WRITE);
 	lpc_send_addr(addr);

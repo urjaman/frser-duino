@@ -26,7 +26,7 @@
 	unsigned char flag;
 	unsigned char mark;
 	flag=0;
-	
+
 	for(divisor=1000000000;divisor>1;divisor/=10) {
 		mark = ((val / divisor) | 0x30);
 		val = (val % divisor);
@@ -45,13 +45,13 @@ void luint2str(unsigned char *buf, unsigned long int val) {
 
 void uint2str(unsigned char *buf, unsigned int val) {
 	luint2str(buf,(unsigned long int)val);
-	}
+}
 
 
 void uchar2str(unsigned char *buf, unsigned char val) {
 	uint2str(buf,(unsigned int)val);
-	}
-	
+}
+
 static unsigned char hextab_func(unsigned char offset) {
 	offset |= 0x30;
 	if (offset > 0x39) offset += 7;
@@ -66,18 +66,18 @@ void uchar2xstr(unsigned char *buf,unsigned char val) {
 	buf[1] = hextab_func(offset);
 	buf[2] = 0;
 }
-	
+
 unsigned char str2uchar(unsigned char *buf) {
 	unsigned char rv;
 	for (rv=0;*buf;buf++) {
 		if ((*buf >= '0')||(*buf <= '9')) {
 			rv *= 10;
 			rv = rv + (*buf &0x0F);
-			
+
 		}
-		}
-	return rv;
 	}
+	return rv;
+}
 
 static unsigned char reverse_hextab(unsigned char hexchar) {
 	if (hexchar > 0x39) hexchar = hexchar - 7;
@@ -123,7 +123,7 @@ unsigned char xstr2uchar(unsigned char *buf) {
 	buf++;
 	rv |= reverse_hextab(*buf);
 	return rv;
-	}
+}
 
 
 
@@ -132,7 +132,7 @@ unsigned char xstr2uchar(unsigned char *buf) {
 	unsigned char flag=0;
 	unsigned char mark;
 	unsigned char shift;
-	
+
 	for(shift=28;shift>0;shift -= 4) {
 		mark = hextab_func(((val>>shift)&0x0F));
 		if ((mark != 0x30)||(flag)) {
@@ -156,7 +156,7 @@ void uint2xstr(unsigned char *buf,unsigned int val) {
 
 unsigned char bcd2bin(unsigned char bcd) {
         return ((bcd>>4)*10)+(bcd&0x0F);
-        }
+}
 unsigned char bin2bcd(unsigned char bin) {
         return (((bin/10)<<4)|(bin%10));
-        }
+}

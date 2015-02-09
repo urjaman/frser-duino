@@ -28,13 +28,11 @@
 
 #define FWH_BL_ADDR 0xff000000
 
-bool fwh_init(void)
-{
+bool fwh_init(void) {
 	return nibble_init();
 }
 
-void fwh_cleanup(void)
-{
+void fwh_cleanup(void) {
 	nibble_cleanup();
 }
 
@@ -42,8 +40,7 @@ void fwh_cleanup(void)
 
 #define fwh_start(v) nibble_start(v)
 
-static void fwh_send_imaddr(uint32_t addr)
-{
+static void fwh_send_imaddr(uint32_t addr) {
 #if 0
 	int8_t i;
 	addr |= FWH_BL_ADDR;
@@ -70,8 +67,7 @@ static void fwh_send_imaddr(uint32_t addr)
 #endif
 }
 
-int fwh_read_address(uint32_t addr)
-{
+int fwh_read_address(uint32_t addr) {
 	fwh_start(FWH_START_READ);
 	fwh_nibble_write(0);	/* IDSEL hardwired */
 	fwh_send_imaddr(addr);
@@ -88,8 +84,7 @@ int fwh_read_address(uint32_t addr)
 	return byte;
 }
 
-bool fwh_write_address(uint32_t addr, uint8_t byte)
-{
+bool fwh_write_address(uint32_t addr, uint8_t byte) {
 	fwh_start(FWH_START_WRITE);
 	fwh_nibble_write(0);	/* IDSEL hardwired */
 	fwh_send_imaddr(addr);

@@ -270,7 +270,7 @@ void flash_idchip_cmd(void) {
 
 static void sendstr_no(void) {
 	sendstr_P(PSTR(" NO"));
-}	
+}
 
 void spi_id_cmd(void) {
 	uint8_t buf[4];
@@ -304,7 +304,7 @@ void spi_id_cmd(void) {
 	} else {
 		sendstr_no();
 	}
-}	
+}
 
 static void print_bool(uint8_t v) {
 	if (v) sendstr_P(PSTR("TRUE"));

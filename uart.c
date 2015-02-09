@@ -69,7 +69,7 @@ ISR(USART0_UDRE_vect) {
 uint8_t uart_isdata(void) {
 	if (uart_rcvwptr != uart_rcvrptr) { return 1; }
 	else { return 0; }
-	}
+}
 
 static void uart_wait_start(void) {
 	TCNT1 = 0; /* Clear timer. */
@@ -114,7 +114,7 @@ uint8_t uart_recv(void) {
 	if(reg==UART_BUFLEN) reg = 0;
 	uart_rcvrptr = reg;
 	return val;
-	}
+}
 
 void uart_send(uint8_t val) {
 #ifndef UART_POLLED_TX
@@ -131,7 +131,7 @@ void uart_send(uint8_t val) {
 	while (!(UCSR0A & _BV(UDRE0))); // wait for space in reg
 	UDR0 = val;
 #endif
-	}
+}
 
 void uart_init(void) {
 	cli();
@@ -159,7 +159,7 @@ void uart_init(void) {
 	UCSR0B = 0x98; // RXC int, receiver adn transmitter
 #endif
 	sei();
-	}
+}
 
 void uart_wait_txdone(void) {
 #ifndef UART_POLLED_TX

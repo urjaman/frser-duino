@@ -43,7 +43,7 @@ static const struct baudentry sp_baudtable[] = {
 #if defined(B38400)
 	BAUDENTRY(38400)
 #endif
-#if defined(B57600) 
+#if defined(B57600)
 	BAUDENTRY(57600)
 #endif
 #if defined(B115200)
@@ -61,7 +61,7 @@ static const struct baudentry sp_baudtable[] = {
 #if defined(B576000)
 	BAUDENTRY(576000)
 #endif
-#if defined(B921600) 
+#if defined(B921600)
 	BAUDENTRY(921600)
 #endif
 #if defined(B1000000)
@@ -70,7 +70,7 @@ static const struct baudentry sp_baudtable[] = {
 #if defined(B1152000)
 	BAUDENTRY(1152000)
 #endif
-#if defined(B1500000) 
+#if defined(B1500000)
 	BAUDENTRY(1500000)
 #endif
 #if defined(B2000000)
@@ -126,7 +126,7 @@ int open_devfd(char * fn) {
 	if (fd == -1) {
 		printf("Serial open fail\n");
 		exit(2);
-		}
+	}
 	fcntl(fd, F_SETFL, 0);
 	tcgetattr(fd,&options);
 	cfsetispeed(&options, B115200);
@@ -141,10 +141,10 @@ int open_devfd(char * fn) {
 	options.c_iflag &= ~(IXON | IXOFF | IXANY);
 	options.c_oflag &= ~OPOST;
 	options.c_cc[VTIME] = 0;
-	
+
 	tcsetattr(fd, TCSANOW, &options);
 	return fd;
-	}
+}
 
 void dev_read(int fd, void*buf, int count) {
 	int i;
@@ -175,7 +175,7 @@ int main(int argc, char * argv[]) {
 	unsigned int bljump_baud = 0;
 	uint8_t c;
 	int devfd,flashfd,i,datasz,pagesz;
-	if (argc < 3) { 
+	if (argc < 3) {
 		printf("Usage: %s flash_file serial_device\n",argv[0]);
 		exit(1);
 	}
@@ -203,16 +203,16 @@ int main(int argc, char * argv[]) {
 	memset(buffer,0xFF,MAX_SIZE);
 	datasz = read(flashfd,buffer,MAX_SIZE);
 	if (datasz < 1) {
-			printf("Flash file read fail\n");
-			exit(4);
+		printf("Flash file read fail\n");
+		exit(4);
 	}
 	close(flashfd);
 	c = INIT_CMD;
 	dev_write(devfd,&c,1);
 	dev_read(devfd,&c,1);
 	if (c != TAG_CHAR) {
-			printf("Read invalid - 0x%02X\n",(int)c);
-			exit(7);
+		printf("Read invalid - 0x%02X\n",(int)c);
+		exit(7);
 	}
 	dev_read(devfd,&c,1);
 	pagesz = c;

@@ -25,6 +25,8 @@ void uart_send(uint8_t val);
 void uart_init(void);
 void uart_wait_txdone(void);
 
+/* We assume to other half to be perfect.... */
+#define BAUD_TOL 3
 
 #define RECEIVE() uart_recv()
 #define SEND(n) uart_send(n)

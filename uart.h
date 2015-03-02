@@ -1,5 +1,5 @@
 /*
- * This file is part of the frser-atmega644 project.
+ * This file is part of the frser-duino project.
  *
  * Copyright (C) 2010,2011 Urja Rannikko <urjaman@gmail.com>
  *
@@ -24,23 +24,21 @@ uint8_t uart_recv(void);
 void uart_send(uint8_t val);
 void uart_init(void);
 void uart_wait_txdone(void);
-void uart_set_timeout(jmp_buf *buf);
-uint8_t uart_peek(void);
 
+#ifdef U2
+#define BAUD 115200
+#else
+#ifdef FTDI
+#define BAUD 2000000
+#else
+/* Mega644p test device */
 #define BAUD 1500000
-//#define BAUD 500000
-//#define BAUD 115200
-#define PEEK() uart_peek()
+#endif
+#endif
+
 #define RECEIVE() uart_recv()
 #define SEND(n) uart_send(n)
-#define UART_BUFLEN 1280
-// At high speed polled TX is faster than interrupt TX
-#if BAUD > 115200
+#define UART_BUFLEN 1024
+/* Compat; Int Tx support was stripped. */
 #define UART_POLLED_TX
-#endif
-
-#ifdef UART_POLLED_TX
 #define UARTTX_BUFLEN 0
-#else
-#define UARTTX_BUFLEN 248
-#endif

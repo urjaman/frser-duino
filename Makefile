@@ -1,7 +1,7 @@
 ##
 ## This file is part of the frser-atmega644 project.
 ##
-## Copyright (C) 2010,2011 Urja Rannikko <urjaman@gmail.com>
+## Copyright (C) 2010,2011,2015 Urja Rannikko <urjaman@gmail.com>
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -18,10 +18,9 @@
 ## Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 ##
 
-PROJECT=frser-atmega644
-DEPS=uart.h frser.h udelay.h main.h parallel.h lpc.h flash.h fwh.h nibble.h Makefile
-CIFACE_SOURCES=ciface.c console.c lib.c appdb.c commands.c
-SOURCES=main.c uart.c flash.c udelay.c frser.c parallel.c lpc.c spi.c fwh.c nibble.c $(CIFACE_SOURCES)
+PROJECT=frser-duino
+DEPS=uart.h frser.h udelay.h main.h spi.h Makefile
+SOURCES=main.c uart.c udelay.c frser.c spi.c 
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
@@ -56,7 +55,7 @@ asm: $(SOURCES) $(DEPS)
 #	$(AVRBINDIR)$(AVRDUDECMD) -U flash:w:$(PROJECT).hex
 
 program: $(PROJECT).bin serialprogrammer
-	sudo make sr-program
+	su -c 'make sr-program'
 
 clean:
 	rm -f $(PROJECT).bin

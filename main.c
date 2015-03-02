@@ -1,5 +1,5 @@
 /*
- * This file is part of the frser-atmega644 project.
+ * This file is part of the frser-duino project.
  *
  * Copyright (C) 2010 Urja Rannikko <urjaman@gmail.com>
  *
@@ -20,18 +20,19 @@
 
 #include "main.h"
 #include "uart.h"
-#include "flash.h"
 #include "frser.h"
 
-static uint8_t rst_reason;
-uint8_t get_rst_reason(void) {
-	return rst_reason;
-}
 
 int main(void) {
 	cli();
-	rst_reason = MCUSR;
-	MCUSR = 0;
+	DDRA=0;
+	DDRB=0;
+	DDRC=0;
+	DDRD=0;
+	PORTA=0xFF;
+	PORTB=0xFF;
+	PORTC=0xFF;
+	PORTD=0xFF;
 	uart_init();
 	power_adc_disable();
 	power_timer0_disable();

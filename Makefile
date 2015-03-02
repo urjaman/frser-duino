@@ -32,7 +32,7 @@ BAUD:=115200
 
 AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BAUD) 
 
-AVRBINDIR=/usr/avr/bin/
+#AVRBINDIR=/usr/avr/bin/
 CFLAGS=-mmcu=$(MMCU) -DBAUD=$(BAUD) -Os -Wl,--relax -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
 
 

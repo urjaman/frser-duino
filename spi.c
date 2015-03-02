@@ -85,8 +85,8 @@ void spi_deselect(void) {
 }
 
 void spi_init(void) {
-	/* set SS low */
-	SPI_PORT &= ~(1<<SS);
+	/* set SS high - why was it low, we're not yet ready to access it... ?!? */
+	SPI_PORT |= _BV(SS);
 	/* Enable MOSI,SCK,SS as output like on
 	http://en.wikipedia.org/wiki/File:SPI_single_slave.svg */
 	DDR_SPI = (1<<MOSI)|(1<<SCK)|(1<<SS);

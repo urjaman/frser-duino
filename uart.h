@@ -25,16 +25,6 @@ void uart_send(uint8_t val);
 void uart_init(void);
 void uart_wait_txdone(void);
 
-#ifdef U2
-#define BAUD 115200
-#else
-#ifdef FTDI
-#define BAUD 2000000
-#else
-/* Mega644p test device */
-#define BAUD 1500000
-#endif
-#endif
 
 #define RECEIVE() uart_recv()
 #define SEND(n) uart_send(n)

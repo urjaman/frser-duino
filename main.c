@@ -25,19 +25,7 @@
 
 int main(void) {
 	cli();
-	DDRA=0;
-	DDRB=0;
-	DDRC=0;
-	DDRD=0;
-	PORTA=0xFF;
-	PORTB=0xFF;
-	PORTC=0xFF;
-	PORTD=0xFF;
 	uart_init();
-	power_adc_disable();
-	power_timer0_disable();
-	power_timer2_disable();
-	power_twi_disable();
 	frser_main();
 }
 

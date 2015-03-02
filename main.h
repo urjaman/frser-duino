@@ -1,5 +1,5 @@
 /*
- * This file is part of the frser-atmega644 project.
+ * This file is part of the frser-duino project.
  *
  * Copyright (C) 2010 Urja Rannikko <urjaman@gmail.com>
  *
@@ -19,7 +19,7 @@
  */
 
 /* GENERIC DEFINITIONS FOR PROJECT */
-#define F_CPU 12000000
+#define F_CPU 16000000UL
 #include <util/delay.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>

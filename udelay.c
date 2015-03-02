@@ -1,5 +1,5 @@
 /*
- * This file is part of the frser-atmega644 project.
+ * This file is part of the frser-duino project.
  *
  * Copyright (C) 2009 Urja Rannikko <urjaman@gmail.com>
  *

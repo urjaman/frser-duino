@@ -1,5 +1,5 @@
 /*
- * This file is part of the frser-atmega644 project.
+ * This file is part of the frser-duino project.
  *
  * Copyright (C) 2009,2011,2013 Urja Rannikko <urjaman@gmail.com>
  *
@@ -28,7 +28,7 @@ static uint8_t volatile uart_rcvbuf[UART_BUFLEN];
 static urxbufoff_t volatile uart_rcvwptr;
 static urxbufoff_t uart_rcvrptr;
 
-ISR(USART0_RX_vect) {
+ISR(USART_RX_vect) {
 	urxbufoff_t reg = uart_rcvwptr;
 	uart_rcvbuf[reg++] = UDR0;
 	if(reg==UART_BUFLEN) reg = 0;
@@ -36,8 +36,11 @@ ISR(USART0_RX_vect) {
 }
 
 uint8_t uart_isdata(void) {
-	if (uart_rcvwptr != uart_rcvrptr) { return 1; }
-	else { return 0; }
+	cli();
+	urxbufoff_t rcvw = uart_rcvwptr;
+	sei();
+	if (rcvw != uart_rcvrptr) return 1;
+	return 0;
 }
 
 static void uart_waiting(void) {
@@ -65,7 +68,7 @@ uint8_t uart_recv(void) {
 
 void uart_send(uint8_t val) {
 	while (!(UCSR0A & _BV(UDRE0))); // wait for space in reg
-	_delay_us(10);
+	_delay_us(10); // U2 hack
 	UDR0 = val;
 }
 

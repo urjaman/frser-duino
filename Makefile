@@ -28,12 +28,16 @@ MMCU=atmega328p
 
 #device ...
 SERIAL_DEV=/dev/ttyACM0
-BAUD:=115200
+# Bootloader
+BLBAUD:=115200
+# Flashrom serial (=serprog)
+FRBAUD:=115200
 
-AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BAUD) 
+AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BLBAUD) 
 
 #AVRBINDIR=/usr/avr/bin/
-CFLAGS=-mmcu=$(MMCU) -DBAUD=$(BAUD) -Os -Wl,--relax -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
+
+CFLAGS=-mmcu=$(MMCU) -DBAUD=$(FRBAUD) -Os -Wl,--relax -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
 
 
 all: $(PROJECT).out

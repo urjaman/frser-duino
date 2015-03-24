@@ -26,12 +26,15 @@ LD=avr-ld
 OBJCOPY=avr-objcopy
 MMCU=atmega328p
 
-#device ...
-SERIAL_DEV=/dev/ttyACM0
+# These defaults are for the U2-equipped arduino,
+# feel free to change.
+
+#Device
+SERIAL_DEV ?= /dev/ttyACM0
 # Bootloader
-BLBAUD:=115200
+BLBAUD ?= 115200
 # Flashrom serial (=serprog)
-FRBAUD:=115200
+FRBAUD ?= 115200
 
 AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BLBAUD) 
 
@@ -70,3 +73,14 @@ clean:
 
 objdump: $(PROJECT).out
 	$(AVRBINDIR)avr-objdump -xdC $(PROJECT).out | less
+
+# Compatibility with serprog-duino / User Friendlyness helpers 
+u2: clean all
+
+flash-u2: program
+
+ftdi:
+	FRBAUD=2000000 $(MAKE) clean all
+
+flash-ftdi:
+	BLBAUD=57600 SERIAL_DEV=/dev/ttyUSB0 $(MAKE) program

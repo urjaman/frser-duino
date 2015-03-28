@@ -23,3 +23,4 @@ make program - "flashes"
 These are effectively synonyms for u2 and flash-u2,
 except that "make" doesnt clean out the previous build if it sees no changes.
 
+Note: the repository has a submodule, clone with --recursive.

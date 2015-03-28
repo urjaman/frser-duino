@@ -1,0 +1,3 @@
+[submodule "libfrser"]
+	path = libfrser
+	url = https://github.com/urjaman/libfrser.git

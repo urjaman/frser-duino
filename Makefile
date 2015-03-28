@@ -19,8 +19,8 @@
 ##
 
 PROJECT=frser-duino
-DEPS=uart.h frser.h udelay.h main.h spi.h Makefile
-SOURCES=main.c uart.c udelay.c frser.c spi.c 
+DEPS=uart.h main.h Makefile
+SOURCES=main.c uart.c spihw.c
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
@@ -41,6 +41,10 @@ AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BLBAUD)
 #AVRBINDIR=/usr/avr/bin/
 
 CFLAGS=-mmcu=$(MMCU) -DBAUD=$(FRBAUD) -Os -Wl,--relax -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
+
+include libfrser/Makefile.frser
+include libfrser/Makefile.spilib
+include libfrser/Makefile.spihw_avrspi
 
 
 all: $(PROJECT).out

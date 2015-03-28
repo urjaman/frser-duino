@@ -24,7 +24,6 @@
 
 
 int main(void) {
-	cli();
 	uart_init();
 	frser_main();
 }

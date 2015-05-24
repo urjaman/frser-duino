@@ -56,11 +56,11 @@ $(PROJECT).bin: $(PROJECT).out
 	$(AVRBINDIR)$(OBJCOPY) -j .text -j .data -O binary $(PROJECT).out $(PROJECT).bin
  
 $(PROJECT).out: $(SOURCES) $(DEPS)
-	$(AVRBINDIR)$(CC) $(CFLAGS) -I./ -o $(PROJECT).out $(SOURCES)
+	$(AVRBINDIR)$(CC) $(CFLAGS) -I. -o $(PROJECT).out $(SOURCES)
 	$(AVRBINDIR)avr-size $(PROJECT).out
 	
 asm: $(SOURCES) $(DEPS)
-	$(AVRBINDIR)$(CC) $(CFLAGS) -S  -I./ -o $(PROJECT).s $(SOURCES)
+	$(AVRBINDIR)$(CC) $(CFLAGS) -S  -I. -o $(PROJECT).s $(SOURCES)
 	
 
 program: $(PROJECT).hex

@@ -35,12 +35,14 @@ SERIAL_DEV ?= /dev/ttyACM0
 BLBAUD ?= 115200
 # Flashrom serial (=serprog)
 FRBAUD ?= 115200
+#Additional defines (used my make ftdi)
+DFLAGS ?=
 
 AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BLBAUD) 
 
 #AVRBINDIR=/usr/avr/bin/
 
-CFLAGS=-mmcu=$(MMCU) -DBAUD=$(FRBAUD) -Os -Wl,--relax -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99
+CFLAGS=-mmcu=$(MMCU) -DBAUD=$(FRBAUD) -Os -Wl,--relax -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99 $(DFLAGS)
 
 include libfrser/Makefile.frser
 include libfrser/Makefile.spilib
@@ -54,14 +56,14 @@ $(PROJECT).hex: $(PROJECT).out
 
 $(PROJECT).bin: $(PROJECT).out
 	$(AVRBINDIR)$(OBJCOPY) -j .text -j .data -O binary $(PROJECT).out $(PROJECT).bin
- 
+
 $(PROJECT).out: $(SOURCES) $(DEPS)
 	$(AVRBINDIR)$(CC) $(CFLAGS) -I. -o $(PROJECT).out $(SOURCES)
 	$(AVRBINDIR)avr-size $(PROJECT).out
-	
+
 asm: $(SOURCES) $(DEPS)
 	$(AVRBINDIR)$(CC) $(CFLAGS) -S  -I. -o $(PROJECT).s $(SOURCES)
-	
+
 
 program: $(PROJECT).hex
 	$(AVRBINDIR)$(AVRDUDECMD) -U flash:w:$(PROJECT).hex
@@ -73,18 +75,18 @@ clean:
 	rm -f $(PROJECT).hex
 	rm -f $(PROJECT).s
 	rm -f *.o
-	
+
 
 objdump: $(PROJECT).out
 	$(AVRBINDIR)avr-objdump -xdC $(PROJECT).out | less
 
-# Compatibility with serprog-duino / User Friendlyness helpers 
+# Compatibility with serprog-duino / User Friendlyness helpers
 u2: clean all
 
 flash-u2: program
 
 ftdi:
-	FRBAUD=2000000 $(MAKE) clean all
+	DFLAGS=-DFTDI FRBAUD=2000000 $(MAKE) clean all
 
 flash-ftdi:
 	BLBAUD=57600 SERIAL_DEV=/dev/ttyUSB0 $(MAKE) program

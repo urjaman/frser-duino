@@ -68,7 +68,10 @@ uint8_t uart_recv(void) {
 
 void uart_send(uint8_t val) {
 	while (!(UCSR0A & _BV(UDRE0))); // wait for space in reg
+	/* FTDI basically means a properly working USB-serial converter at whatever baudrate you chose. */
+#ifndef FTDI
 	_delay_us(10); // U2 hack
+#endif
 	UDR0 = val;
 }
 

@@ -28,3 +28,27 @@ You can change what the traditional targets do by either
 
 
 Note: the repository has a submodule, clone with --recursive.
+
+
+### About the various (broken) usb-serial converters
+
+- Arduino Uno with ATMega 8U2/16U2: their default firmware is quite broken,  
+	but the default settings works around it at 115200 (slowly).
+
+	If you're willing to test, I have an alternative firmware for it:
+	https://github.com/urjaman/fast-usbserial
+	with that firmware you should be able to use it as if it was an FTDI,
+	meaning with make ftdi and at 2Mbaud. This means that for this case
+	it would be valid to say `make ftdi; make flash-u2`. The flash targets
+	dont check what kind of binary they're flashing.
+	(Note: My benchmarks say it is still slower than the FTDI.)
+
+
+- A "VISduino" named Uno R3 clone with with a CH340G:  
+	It is a cheap usb-serial converter chip, and if it
+	in general works on your computer (google had reports of it not
+	working with all usb chipsets) you can treat it like an FTDI
+	with a maximum baudrate of 115200. Claims 2Mbaud but apparently
+	doesnt have big enough buffers for operation at that speed.
+	Commands would be (if you dont touch the defaults in Makefile):  
+	`DFLAGS=-DFTDI make clean all` and `SERIAL_DEV=/dev/ttyUSB0 make program`

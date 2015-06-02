@@ -22,7 +22,7 @@ make program - "flashes"
 
 These are by default effectively synonyms for u2 and flash-u2,
 except that "make" doesnt clean out the previous build if it sees no changes.
-You can change what the traditional targets do by either
+You can change what the traditional targets do by either  
 1. changing the defines at the beginning of the makefile, or
 2. using environment variables, for example: `BLBAUD=115200 SERIAL_DEV=/dev/ttyUSB1 make program`
 

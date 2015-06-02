@@ -81,9 +81,11 @@ objdump: $(PROJECT).out
 	$(AVRBINDIR)avr-objdump -xdC $(PROJECT).out | less
 
 # Compatibility with serprog-duino / User Friendlyness helpers
-u2: clean all
+u2:
+	DFLAGS= FRBAUD=115200 $(MAKE) clean all
 
-flash-u2: program
+flash-u2:
+	BLBAUD=115200 SERIAL_DEV=/dev/ttyACM0 $(MAKE) program
 
 ftdi:
 	DFLAGS=-DFTDI FRBAUD=2000000 $(MAKE) clean all

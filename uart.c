@@ -28,7 +28,7 @@ static uint8_t volatile uart_rcvbuf[UART_BUFLEN];
 static urxbufoff_t volatile uart_rcvwptr;
 static urxbufoff_t uart_rcvrptr;
 
-ISR(USART_RX_vect) {
+ISR(USART0_RX_vect) {
 	urxbufoff_t reg = uart_rcvwptr;
 	uart_rcvbuf[reg++] = UDR0;
 	if(reg==UART_BUFLEN) reg = 0;

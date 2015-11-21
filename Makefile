@@ -26,19 +26,19 @@ LD=avr-ld
 OBJCOPY=avr-objcopy
 MMCU=atmega1280
 
-# These defaults are for the U2-equipped arduino,
-# feel free to change.
+# These defaults are hopefully OK for Arduino Mega (1280, old, with FTDI)
+# feel free to change (and please make an issue if the defaults are blergh).
 
 #Device
-SERIAL_DEV ?= /dev/ttyACM0
+SERIAL_DEV ?= /dev/ttyUSB0
 # Bootloader
-BLBAUD ?= 115200
+BLBAUD ?= 57600
 # Flashrom serial (=serprog)
 FRBAUD ?= 115200
 #Additional defines (used my make ftdi)
-DFLAGS ?=
+DFLAGS ?= -DFTDI
 
-AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BLBAUD) 
+AVRDUDECMD=avrdude -c arduino -p m1280 -P $(SERIAL_DEV) -b $(BLBAUD)
 
 #AVRBINDIR=/usr/avr/bin/
 

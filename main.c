@@ -24,6 +24,9 @@
 
 
 int main(void) {
+	/* LED off (but driven) for now */
+	PORTB &= ~_BV(7);
+	DDRB |= _BV(7);
 	uart_init();
 	frser_main();
 }

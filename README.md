@@ -1,5 +1,9 @@
-frser-duino
+frser-duino (m1280 edition)
 ===========
+
+The m1280 edition has been tested on:
+- a traditional (FTDI) based Mega1280 
+- an U2-based Mega2560 (with small change to the makefile to target the 2560 instead of 1280)
 
 Alternative code to serprog-duino.  
 We're in process of melding all the good bits of

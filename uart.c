@@ -93,7 +93,7 @@ void uart_init(void) {
 #if USE_2X
 	UCSR0A |= (1 << U2X0);
 #endif
-	UCSR0B = 0x98; // RXC int, receiver adn transmitter
+	UCSR0B = 0x98; // RXC int, receiver and transmitter
 	sei();
 }
 

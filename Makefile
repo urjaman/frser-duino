@@ -35,7 +35,7 @@ SERIAL_DEV ?= /dev/ttyACM0
 BLBAUD ?= 115200
 # Flashrom serial (=serprog)
 FRBAUD ?= 115200
-#Additional defines (used my make ftdi)
+#Additional defines (used by make ftdi)
 DFLAGS ?=
 
 AVRDUDECMD=avrdude -c arduino -p m328p -P $(SERIAL_DEV) -b $(BLBAUD) 

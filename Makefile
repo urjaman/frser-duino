@@ -82,13 +82,15 @@ objdump: $(PROJECT).out
 
 # Compatibility with serprog-duino / User Friendlyness helpers
 u2:
-	DFLAGS= FRBAUD=115200 $(MAKE) clean all
+	$(MAKE) clean
+	DFLAGS= FRBAUD=115200 $(MAKE) all
 
 flash-u2:
 	BLBAUD=115200 SERIAL_DEV=/dev/ttyACM0 $(MAKE) program
 
 ftdi:
-	DFLAGS=-DFTDI FRBAUD=2000000 $(MAKE) clean all
+	$(MAKE) clean
+	DFLAGS=-DFTDI FRBAUD=2000000 $(MAKE) all
 
 flash-ftdi:
 	BLBAUD=57600 SERIAL_DEV=/dev/ttyUSB0 $(MAKE) program

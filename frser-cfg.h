@@ -31,4 +31,10 @@
  * rest of the system, define this. Default is below. Not needed for SPI-only flashers. */
 //#define FRSER_SYS_BYTES 320
 
+#if (defined __AVR_ATmega1280__)||(defined __AVR_ATmega1281__)||(defined __AVR_ATmega2560__)||(defined __AVR_ATmega2561__)
+/* We provide an activity/busy led on the L led of the Arduino Mega. */
+#define FRSER_FEAT_PRE_OPRX_HOOK() do { PORTB &= ~_BV(7); } while(0)
+#define FRSER_FEAT_POST_OPRX_HOOK() do { PORTB |= _BV(7); } while(0)
+#endif
+
 #endif

@@ -24,6 +24,11 @@
 
 
 int main(void) {
+#if (defined __AVR_ATmega1280__)||(defined __AVR_ATmega1281__)||(defined __AVR_ATmega2560__)||(defined __AVR_ATmega2561__)
+	/* Arduino Mega: LED off (but driven) for now */
+	PORTB &= ~_BV(7);
+	DDRB |= _BV(7);
+#endif
 	uart_init();
 	frser_main();
 }

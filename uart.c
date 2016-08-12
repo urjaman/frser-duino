@@ -1,7 +1,7 @@
 /*
  * This file is part of the frser-duino project.
  *
- * Copyright (C) 2009,2011,2013 Urja Rannikko <urjaman@gmail.com>
+ * Copyright (C) 2009,2011,2013,2016 Urja Rannikko <urjaman@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,17 +21,33 @@
 #include "main.h"
 #include "uart.h"
 
-// UART MODULE START
+#if UART_BUFLEN > 256
 typedef uint16_t urxbufoff_t;
-typedef uint8_t utxbufoff_t;
+#else
+typedef uint8_t urxbufoff_t;
+#endif
+
 static uint8_t volatile uart_rcvbuf[UART_BUFLEN];
 static urxbufoff_t volatile uart_rcvwptr;
 static urxbufoff_t uart_rcvrptr;
 
-ISR(USART_RX_vect) {
+#if ((UART_BUFLEN-1) & UART_BUFLEN) == 0
+#define RLIM_RL(r) do { r &= (UART_BUFLEN-1); } while(0)
+#else
+#define RLIM_RL(r) do { if (r>=UART_BUFLEN) r=0; } while(0)
+#endif
+
+#if (defined __AVR_ATmega328P__)||(defined __AVR_ATmega328__)||(defined __AVR_ATmega168P__)||(defined __AVR_ATmega168__)||(__AVR_ATmega88P__)||(__AVR_ATmega88__)||(defined __AVR_ATmega48P__)||(defined __AVR_ATmega48__)
+#define RX_ISR USART_RX_vect
+#else
+/* We assume this is a newer avr with fancier USART ISR names, fix if it warns :) */
+#define RX_ISR USART0_RX_vect
+#endif
+
+ISR(RX_ISR) {
 	urxbufoff_t reg = uart_rcvwptr;
 	uart_rcvbuf[reg++] = UDR0;
-	if(reg==UART_BUFLEN) reg = 0;
+	RLIM_RL(reg);
 	uart_rcvwptr = reg;
 }
 
@@ -61,7 +77,7 @@ uint8_t uart_recv(void) {
 	while (!uart_isdata()) uart_waiting();
 	reg = uart_rcvrptr;
 	val = uart_rcvbuf[reg++];
-	if(reg==UART_BUFLEN) reg = 0;
+	RLIM_RL(reg);
 	uart_rcvrptr = reg;
 	return val;
 }

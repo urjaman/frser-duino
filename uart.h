@@ -30,7 +30,9 @@ void uart_wait_txdone(void);
 
 #define RECEIVE() uart_recv()
 #define SEND(n) uart_send(n)
-#define UART_BUFLEN 1024
+#define RAM_BYTES_ (RAMEND-RAMSTART+1)
+/* SPI only doesnt have opbuf, so can have bigger uart buf than others... */
+#define UART_BUFLEN (RAM_BYTES_/2)
 /* Compat; Int Tx support was stripped. */
 #define UART_POLLED_TX
 #define UARTTX_BUFLEN 0

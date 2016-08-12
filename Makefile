@@ -24,7 +24,7 @@ SOURCES=main.c uart.c spihw.c
 CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
-MMCU=atmega328p
+MMCU ?= atmega328p
 
 # These defaults are for the U2-equipped arduino,
 # feel free to change.

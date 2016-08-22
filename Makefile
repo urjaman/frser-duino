@@ -26,6 +26,7 @@ LD=avr-ld
 OBJCOPY=avr-objcopy
 MMCU ?= atmega328p
 AVRDUDE_MCU ?= m328p
+AVRDUDE_PROGRAMMER ?= arduino
 # These defaults are for the U2-equipped arduino (m328p),
 # feel free to change.
 
@@ -38,7 +39,7 @@ FRBAUD ?= 115200
 #Additional defines (used by make ftdi)
 DFLAGS ?=
 
-AVRDUDECMD=avrdude -c arduino -p $(AVRDUDE_MCU) -P $(SERIAL_DEV) -b $(BLBAUD)
+AVRDUDECMD=avrdude -c $(AVRDUDE_PROGRAMMER) -p $(AVRDUDE_MCU) -P $(SERIAL_DEV) -b $(BLBAUD)
 
 #AVRBINDIR=/usr/avr/bin/
 
@@ -108,5 +109,5 @@ mega2560:
 	DFLAGS= FRBAUD=115200 MMCU=atmega2560 $(MAKE) all
 
 flash-mega2560:
-	BLBAUD=115200 SERIAL_DEV=/dev/ttyACM0 AVRDUDE_MCU=m2560 $(MAKE) program
+	BLBAUD=115200 AVRDUDE_PROGRAMMER="stk500v2" SERIAL_DEV=/dev/ttyACM0 AVRDUDE_MCU=m2560 $(MAKE) program
 

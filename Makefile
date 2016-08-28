@@ -43,7 +43,7 @@ AVRDUDECMD=avrdude -c $(AVRDUDE_PROGRAMMER) -p $(AVRDUDE_MCU) -P $(SERIAL_DEV) -
 
 #AVRBINDIR=/usr/avr/bin/
 
-CFLAGS=-mmcu=$(MMCU) -DBAUD=$(FRBAUD) -Os -Wl,--relax -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99 $(DFLAGS)
+CFLAGS=-mmcu=$(MMCU) -DBAUD=$(FRBAUD) -Os -fno-inline-small-functions -fno-tree-switch-conversion -frename-registers -g -Wall -W -pipe -flto -fwhole-program -std=gnu99 $(DFLAGS)
 
 include libfrser/Makefile.frser
 include libfrser/Makefile.spilib

@@ -52,3 +52,10 @@ Note: the repository has a submodule, clone with --recursive.
 	doesnt have big enough buffers for operation at that speed.  
 	Commands would be (if you dont touch the defaults in Makefile):  
 	`DFLAGS=-DFTDI make clean all` and `SERIAL_DEV=/dev/ttyUSB0 make program`
+
+### Using an Arduino and an external usb-serial converter
+
+If you have an Arduino without a FTDI chip, but you are lucky enough to have an
+extra usb-serial converter laying around, you can use it to speed up the flashing.
+Just connect the usb-serial converter with the RX(Pin 0), TX(Pin 1) and GND pins
+on your Arduino and use the instructions for the `ftdi` target from above.

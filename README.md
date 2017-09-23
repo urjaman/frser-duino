@@ -1,3 +1,7 @@
+go look at the master branch, nothing to see here anymore
+=========================================================
+I'll delete this branch once I have a moment to verify i forgot nothing of use here :P
+
 frser-duino (m1280 edition)
 ===========
 

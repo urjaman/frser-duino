@@ -25,6 +25,8 @@ CC=avr-gcc
 LD=avr-ld
 OBJCOPY=avr-objcopy
 MMCU=atmega1280
+AVRDUDE_MCU ?= m1280
+AVRDUDE_PROGRAMMER ?= wiring
 
 # These defaults are hopefully OK for Arduino Mega (1280, old, with FTDI)
 # feel free to change (and please make an issue if the defaults are blergh).
@@ -38,7 +40,7 @@ FRBAUD ?= 115200
 #Additional defines (used my make ftdi)
 DFLAGS ?= -DFTDI
 
-AVRDUDECMD=avrdude -c arduino -p m1280 -P $(SERIAL_DEV) -b $(BLBAUD)
+AVRDUDECMD=avrdude -c $(AVRDUDE_PROGRAMMER) -p $(AVRDUDE_MCU) -P $(SERIAL_DEV) -b $(BLBAUD)
 
 #AVRBINDIR=/usr/avr/bin/
 
@@ -81,10 +83,10 @@ objdump: $(PROJECT).out
 	$(AVRBINDIR)avr-objdump -xdC $(PROJECT).out | less
 
 # Compatibility with serprog-duino / User Friendlyness helpers
-u2:
+usb:
 	DFLAGS= FRBAUD=115200 $(MAKE) clean all
 
-flash-u2:
+flash-usb:
 	BLBAUD=115200 SERIAL_DEV=/dev/ttyACM0 $(MAKE) program
 
 ftdi:

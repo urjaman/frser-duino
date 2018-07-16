@@ -88,6 +88,9 @@ u2:
 
 flash-u2:
 	BLBAUD=115200 SERIAL_DEV=/dev/ttyACM0 $(MAKE) program
+	
+flash-ch341:
+	BLBAUD=115200 SERIAL_DEV=/dev/ttyUSB0 $(MAKE) program
 
 ftdi:
 	$(MAKE) clean
